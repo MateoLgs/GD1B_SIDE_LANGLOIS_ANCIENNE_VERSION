@@ -12,87 +12,335 @@
     </style>
 </head>
 <body>
+    <div>
+        <div>Vies : <span id="vies">5</span></div>
 <div>Pièces : <span id="totalPieces">0</span></div>
-<div>Pv : <span id="Health">100</span></div>
-<script type="text/javascript">
-     var config = {
+<span>Froid : </span>
+<label id="froidNombre">200</label><span> % </span>
+<progress  value="200" max="200" id="froid"></progress>
 
-    type: Phaser.AUTO,
-    width: 1280,
-    height: 720,
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: { y: 1000 },
-            debug: false,
-            fps: 60
-        },
-    },
-    input: {
-        gamepad: true
-    },
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
+<script type="text/javascript">
+     
+    
+    
+
+    
+    
+    
+class Menu extends Phaser.Scene {
+
+    constructor () {
+        super('Menu');
+    }
+        preload(){
+              this.load.image('Menu', 'assets/menuScreen.jpg');
+              this.load.image('menuLevel1Button', 'assets/menuLevel1Button.png');
+              this.load.image('menuLevel2Button', 'assets/menuLevel2Button.png');
+        }
+    create() {
+
+        var menuBackground = this.add.image(600, 400, 'Menu');
+        var menuLevel1Button = this.add.image(400, 400, 'menuLevel1Button').setScale(0.5).setInteractive();
+        var menuLevel2Button = this.add.image(800, 400, 'menuLevel2Button').setScale(0.5).setInteractive();
+
+  menuLevel1Button.on('pointerdown', () => {
+      this.choixMenulevel1Button();
+        }) 
+        
+  menuLevel2Button.on('pointerdown', () => {
+      this.choixMenulevel2Button();
+        }) 
+
+
+    }
+    choixMenulevel1Button(){
+              level="level1"
+      this.scene.start('Jeu');
     }
 
-};
-
-
-
-
-var machineGunSnowballActive=false;
-var cooldownMachineGunSnowball = 360;
-var machineGunSnowballUses = 3;
-var cooldownSnowball = 120;
-var onPlatform ="";
-var bomb;
-var runSpeed = 1;
-var totalCoins=0;
-var player;
-var playerAlive= true;
-var healthAmount = 100;
-var health;
-var bombs;
-var platforms;
-var cursors;
-var scoreplayer = 0;
-var snowball;
-var roquette;
-var playerLeft = 1;
-var scoreText;
- 
-var jumpsPlayer = 1
-var jumpingPlayer = true
-
-var snowballPowerUpActive = false
-var snowballPlayer = true
+    choixMenulevel2Button(){
+        level="level2"
+      this.scene.start('Jeu');
+    }
     
-var delaiSnowballPlayer = 120;
+    
+    
+}
+       
+       
+
+class Jeu extends Phaser.Scene{
+      constructor () {
+        super('Jeu');
+      }
+
+    
+  lancerSnowballSnowman(snowman){
+       var snowball = snowballs.create(this.snowman.x, this.snowman.y, 'snowball');
+        snowball.setVelocity(0, 200);
+  }
+    
+  killSnowman(snowman, fireball){
+      snowman.destroy();
+      fireball.destroy();
+  }    
+    
+  lancerFireballRight(player){
+        var bomb = bombs.create(player.x, player.y, 'fireball');
+        bomb.setBounce(0.9);
+        bomb.body.setAllowGravity(false);
+        bomb.setVelocity(700, 0);
+}
    
+  lancerFireballLeft(player){
+      var bomb = bombs.create(player.x, player.y, 'fireball');
+        bomb.body.setAllowGravity(false);
+        bomb.setVelocity(-700, 0);
+}
+    
+  lancerFireballUp(player){
+      var bomb = bombs.create(player.x, player.y, 'fireball');
+        bomb.setBounce(0.9);
+        bomb.body.setAllowGravity(false);
+        bomb.setVelocity(0, -700);
+}
+    
+  lancerFireballDown(player){
+      var bomb = bombs.create(player.x, player.y, 'fireball');
+        bomb.setBounce(0.9);
+        bomb.body.setAllowGravity(false);
+        bomb.setVelocity(0, 700);
+}   
+   
+  lancerfireball(player){
 
-var keyZ;
-var keyS;
-var keyD;
-var keyQ;
 
-var game = new Phaser.Game(config);
+         var bomb = bombs.create(player.x, player.y, 'fireball');
+        bomb.setBounce(0.9);
+        bomb.body.setAllowGravity(false);
+    
+        var directionFireballPlayer = Math.round(Phaser.Math.Between(0,1))
+        
+        if(keyQ.isDown){
+            directionFireballPlayer=-700;
+        }
+        else if(keyD.isDown){
+            directionFireballPlayer=700;
+        }
+        else if(keyD.isUp && keyQ.isUp && keyZ.isUp && directionFireballPlayer==1){
+            directionFireballPlayer=700;
+        }
+        else if(keyD.isUp && keyQ.isUp && keyZ.isUp && directionFireballPlayer==0){
+            directionFireballPlayer=-700;
+        }
+    
+    
+        
+        if(cursors.left.isDown){
+            directionFireballPlayer=-700;
+        }
+        else if(cursors.right.isDown){
+            directionFireballPlayer=700;
+        }
+        else if(cursors.left.isUp && cursors.right.isUp && cursors.up.isUp  && directionFireballPlayer==1){
+            directionFireballPlayer=700;
+        }
+        else if(cursors.left.isUp && cursors.right.isUp && cursors.up.isUp && directionFireballPlayer==0){
+            directionFireballPlayer=-700;
+        }
+        
+        bomb.setVelocity(directionFireballPlayer, 0);
+       
+    
+      }
+ 
+  destroyFireball(bomb){
+    bomb.destroy();
+}  
 
-var coins;
+  destroySnowball(snowball){
+    snowball.destroy();
+}
+    
+  destroyPlatformFake(platformFake){
+      platformFake.disableBody(true, true); 
+      //platformFake.disableBody(false, false);
+      console.log("destroy")
+  }
+    
+  showPlatformInvisible(platformInvisble){
+      platformInvisble.setAlpha(1);
+  }    
+    
+  collectHealthPlayer(powerUpHealth){
+    powerUpHealth.destroy();
 
-function preload ()
-{
+    //  Add and update the score
+    froid.value += 30;
+	froidNombre.innerHTML = froid.value;
+ 
+}
+    
+  collectCoin(coin){
+   /* healthAmount-=10
+     Health.innerHTML=healthAmount*/
+    coin.destroy();
+    totalCoins+=1;
+    totalPieces.innerHTML=totalCoins
+    console.log(totalCoins);
+      
+}
+    
+  collectPowerUpFireball(powerUpFireball){
+    powerUpFireball.destroy();
+    if(fireballPowerUpActive==true){
+        machineGunFireballUses+=1;
+    }
+    fireballPowerUpActive= true;
+    console.log('PowerUp fireball Récupéré') ;
+}
+    
+  contactDrapeau(){
+    
+    if(totalCoins>14){
+    console.log('Drapeau Débloqué')
+    this.physics.pause();
+    return;  
+    }
+    else {
+        console.log('Vous n\'avez que ' + totalCoins +' pièces')
+    }
+}    
+
+  degatSnowmanJoueur(snowman){
+    snowman.destroy();
+      if(playerInvincible==false){
+     froid.value -= 100;
+	froidNombre.innerHTML = froid.value;
+      }
+      this.playerGoInvincible();
+  }
+    
+  degatSnowballJoueur(snowball){
+    snowball.destroy();
+    if(playerInvincible==false){
+     froid.value -= 50;
+	froidNombre.innerHTML = froid.value;
+    }
+  }
+    
+  hitBomb (player, bomb){
+    death();
+}
+
+  setSpeedPlatform (player, platform) {
+     runSpeed = 1;
+     onPlatform = "platform"
+      if(player.body.blocked.down || player.body.touching.down){
+       standing=true
+      }
+
+
+}
+    
+  setSpeedPlatformSnow (player, platform) {
+
+        onPlatform = "snow"
+     runSpeed = 0.25;
+      if(player.body.blocked.down || player.body.touching.down){
+       standing=true
+      }
+}
+    
+  setSpeedPlatformIce (player, platform) {
+    if(player.body.blocked.down || player.body.touching.down){
+       standing=true
+      }
+  player.setDrag(1)
+
+     onPlatform = "ice"
+      console.log(onPlatform)
+}
+    
+  goRight(){
+    if(keyQ.isDown){
+        player.setVelocityX(0);
+         player.anims.play('turn');
+    }
+      
+   else{   
+    player.setVelocityX(250*runSpeed);
+    player.anims.play('right', true);
+   }
+}
+ 
+  goLeft(){
+    player.setVelocityX(-250*runSpeed);
+    player.anims.play('left', true);
+}
+ 
+  jump(){
+    player.setVelocityY(-500);
+      standing=false;
+}
+    
+  playerGoInvincible(){
+            playerInvincible=true;
+            this.invicibleAfterHitAlpha0;
+            this.time.delayedCall(100, this.invicibleAfterHitAlpha1, null, this);
+            this.time.delayedCall(200, this.invicibleAfterHitAlpha0, null, this);
+            this.time.delayedCall(300, this.invicibleAfterHitAlpha1, null, this);
+            this.time.delayedCall(400, this.invicibleAfterHitAlpha0, null, this);
+            this.time.delayedCall(500, this.invicibleAfterHitAlpha1, null, this);           this.time.delayedCall(600, this.invicibleAfterHitAlpha0, null, this);
+            this.time.delayedCall(700, this.invicibleAfterHitAlpha1, null, this);
+            this.time.delayedCall(800, this.invicibleAfterHitAlpha0, null, this);
+            this.time.delayedCall(900, this.invicibleAfterHitAlpha1, null, this);
+            this.time.delayedCall(1000, this.invisibleOff, null, this);
+
+      
+  }
+
+  invisibleOff(){
+      playerInvincible=false;
+      player.setTint(0xffffff)
+  }
+    
+  invicibleAfterHitAlpha0(){
+      player.setAlpha(0);
+  }
+    
+  invicibleAfterHitAlpha1(){
+      player.setAlpha(1);
+      player.setTint(0xff0000)
+  }
+    
+  death(){
+      
+      viesRestantes-=1;
+      vies.innerHTML=viesRestantes;
+    if(viesRestantes>0){
+     this.scene.start('Death');
+    }
+    if(viesRestantes==0){
+    this.scene.start('GameOver');
+    }
+    }
+
+  preload (){
     
     
     
-    var powerUpSnow = this.load.image('destroySnowball', 'assets/iceCube.png');
+    var powerUpSnow = this.load.image('destroyFireball', 'assets/iceCube.png');
     var powerUpSnow = this.load.image('powerUpSnow', 'assets/iceCube.png');
     var powerUpHealth = this.load.image('powerUpHealth', 'assets/powerUpHealth.png');
+    var platformFake = this.load.image('platformFake', 'assets/platformFakeTile.png');
+    var platformFake = this.load.image('platformInvisible', 'assets/platformFakeTile.png');
+    this.load.image('fireball', 'assets/fireball.png');
     this.load.image('snowball', 'assets/snowball.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.image('sky', 'assets/sky.png');
     this.load.image('flag', 'assets/flag.png');
+    this.load.image('snowman', 'assets/snowman.png');
     this.load.image('ground', 'assets/platform.png');
     this.load.image('health', 'assets/star.png', { width: 10,  height: 20,});
     this.load.spritesheet('dude1', 'assets/dude1.png', { frameWidth: 32, frameHeight: 48 });
@@ -101,28 +349,40 @@ function preload ()
     
     
      this.load.image('tiles', './assets/tileset_gutter.png');
-    this.load.tilemapTiledJSON('map', './assets/map.json');
-    this.load.atlas('atlas', 'assets/mario-atlas.png', 'assets/mario-atlas.json');
+     this.load.atlas('atlas', 'assets/mario-atlas.png', 'assets/mario-atlas.json');
+
+      
+
+     this.load.tilemapTiledJSON('map1', './assets/level1.json');
+     this.load.tilemapTiledJSON('map2', './assets/level2.json');
+   
 
 }
 
-function create ()
-{
+  create (){
    
-    this.map = this.make.tilemap({ key: 'map' });
+     if(level=="level1"){
+           this.map = this.make.tilemap({ key: 'map1' });
+      }
+      if(level=="level2"){
+         this.map = this.make.tilemap({ key: 'map2' });
+      }
+    
+    
     this.tileset = this.map.addTilesetImage('tileset_gutter', 'tiles');
+    //var background = this.map.createStaticLayer('back', this.tileset, 0, 0);
     var platform = this.map.createDynamicLayer('platform', this.tileset, 0, 0);
     var platformSnow = this.map.createDynamicLayer('platformSnow', this.tileset, 0, 0);
     var platformIce = this.map.createDynamicLayer('platformIce', this.tileset, 0, 0);
 
-   //this.map.createStaticLayer('background', this.tileset, 0, 0);
+  
    platform.setCollisionByExclusion(-1, true);
    platformSnow.setCollisionByExclusion(-1, true);
    platformIce.setCollisionByExclusion(-1, true);
 
-
+ 
     player = this.physics.add.sprite(25, 220, 'dude1');
-   
+    
     
     this.cameras.main.zoom = 2;
   
@@ -134,6 +394,93 @@ function create ()
     //else {
         this.cameras.main.startFollow(player, true, 1, 0, 0, 0);  
    // }
+    
+    
+      
+      
+      
+      
+      
+      
+          
+     ///////////////////////////////////////
+    ////////////platformInvisible////////////////////
+      
+     const platformInvisibleObjects = this.map.getObjectLayer('platformInvisible').objects;
+     this.platformInvisible = this.physics.add.group({
+            immovable: true,
+            allowGravity: false
+        });
+
+    for (const platformInvisible of platformInvisibleObjects) {
+    this.platformInvisible.create(platformInvisible.x+7, platformInvisible.y-8, 'platformInvisible').setScale(0.4).setAlpha(0)
+        .setOrigin(0.5,0.5)
+        .setDepth(-1)
+     
+    }
+      
+       
+
+    
+    for (const platformInvisible of this.platformInvisible.children.entries) {
+    platformInvisible.collider = this.physics.add.collider(platformInvisible, player, this.showPlatformInvisible, null, this);
+    
+}  
+      
+    
+     ///////////////////////////////////////
+    ////////////platformFake////////////////////
+
+     const platformFakeObjects = this.map.getObjectLayer('platformFake').objects;
+     this.platformFake = this.physics.add.group({
+            immovable: true,
+            allowGravity: false
+        });
+
+    for (const platformFake of platformFakeObjects) {
+    this.platformFake.create(platformFake.x+7, platformFake.y-8, 'platformFake').setScale(0.4)
+        .setOrigin(0.5,0.5)
+        .setDepth(-1)
+     
+    }
+      
+       
+
+    
+    for (const platformFake of this.platformFake.children.entries) {
+    platformFake.collider = this.physics.add.overlap(platformFake, player, this.destroyPlatformFake, null, this);
+    
+}  
+      
+      
+      
+      
+      
+     ///////////////////////////////////////
+    ////////////Snowman////////////////////
+
+     const snowmanObjects = this.map.getObjectLayer('snowman').objects;
+     this.snowman = this.physics.add.group({
+            immovable: true,
+            allowGravity: false
+        });
+
+    for (const snowman of snowmanObjects) {
+    this.snowman.create(snowman.x, snowman.y-15, 'snowman').setScale(0.05)
+        .setOrigin(0.5,0.5)
+        .setDepth(-1);
+}
+      
+    
+
+    
+    for (const snowman of this.snowman.children.entries) {
+    snowman.collider = this.physics.add.overlap(snowman, player, this.degatSnowmanJoueur, null, this);
+    
+}  
+    
+    
+
     ///////////////////////////////////////
     ////////////Pièces////////////////////
     
@@ -162,7 +509,7 @@ function create ()
 });
     
     for (const coin of this.coins.children.entries) {
-    coin.collider = this.physics.add.overlap(coin, player, collectCoin, null, this);
+    coin.collider = this.physics.add.overlap(coin, player, this.collectCoin, null, this);
 }
     
 
@@ -170,14 +517,14 @@ function create ()
     ///////////////////////////////////////
     ////////////PowerUpSnow////////////
     
-    const powerUpSnowballObjects = this.map.getObjectLayer('powerUpSnowball').objects;
-     this.powerUpSnowball = this.physics.add.group({
+    const powerUpFireballObjects = this.map.getObjectLayer('powerUpFireball').objects;
+     this.powerUpFireball = this.physics.add.group({
             immovable: true,
             allowGravity: false
         });
 
-    for (const powerUpSnowball of powerUpSnowballObjects) {
-    this.powerUpSnowball.create(powerUpSnowball.x+8, powerUpSnowball.y-5,'powerUpSnow').setScale(0.3)
+    for (const powerUpFireball of powerUpFireballObjects) {
+    this.powerUpFireball.create(powerUpFireball.x+8, powerUpFireball.y-5,'powerUpSnow').setScale(0.3)
         .setOrigin(0.5,0.5)
         .setDepth(-1);
 
@@ -185,8 +532,8 @@ function create ()
         
     
     
-    for (const powerUpSnowball of this.powerUpSnowball.children.entries) {
-    powerUpSnowball.collider = this.physics.add.overlap(powerUpSnowball, player, collectPowerUpSnowball, null, this);
+    for (const powerUpFireball of this.powerUpFireball.children.entries) {
+    powerUpFireball.collider = this.physics.add.overlap(powerUpFireball, player, this.collectPowerUpFireball, null, this);
 }
 
     
@@ -209,7 +556,7 @@ function create ()
     
     
     for (const powerUpHealth of this.powerUpHealth.children.entries) {
-    powerUpHealth.collider = this.physics.add.overlap(powerUpHealth, player, collectHealthPlayer, null, this);
+    powerUpHealth.collider = this.physics.add.overlap(powerUpHealth, player, this.collectHealthPlayer, null, this);
 }
     
         ///////////////////////////////////////
@@ -231,7 +578,7 @@ function create ()
 
     
     for (const flag of this.flag.children.entries) {
-    flag.collider = this.physics.add.overlap(flag, player, contactDrapeau, null, this);
+    flag.collider = this.physics.add.overlap(flag, player, this.contactDrapeau, null, this);
 }  
     
     
@@ -265,6 +612,7 @@ function create ()
     // The player and its settings
 
     //  Player physics properties. Give the little guy a slight bounce.
+   
     player.setBounce(0.1);
     player.setCollideWorldBounds(false);
 
@@ -300,7 +648,7 @@ function create ()
         setXY: { x: Phaser.Math.FloatBetween(4, 1000), y: 0, stepX: Phaser.Math.FloatBetween(4, 1000) }
     });*/
 
-   /* healthPowerUp.children.iterate(function (child) {
+   /* healthPowerUp.children.iterate(  (child) {
 
         //  Give each star a slightly different bounce
         child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
@@ -308,8 +656,9 @@ function create ()
     });*/
 
     bombs = this.physics.add.group();
+    snowballs = this.physics.add.group();
     
-    snowball = this.physics.add.group();
+    fireball = this.physics.add.group();
     roquettes = this.physics.add.group();
     //  The score
     scoreText = this.add.text(0, -100, 'Level 1', { fontSize: '32px', fill: '#FFF' });
@@ -319,202 +668,113 @@ function create ()
 
     //this.physics.add.collider(healthPowerUp, platform);
     
-    this.physics.add.collider(bombs, platform, destroySnowball, null, this);
-    this.physics.add.collider(bombs, platformIce, destroySnowball, null, this);
-    this.physics.add.collider(bombs, platformSnow, destroySnowball, null, this);
+    this.physics.add.collider(bombs, platform, this.destroyFireball, null, this);
+    this.physics.add.collider(bombs, platformIce, this.destroyFireball, null, this);
+    this.physics.add.collider(bombs, platformSnow, this.destroyFireball, null, this);
+      
 
- //   this.physics.add.collider(snowball, platform);
+      
+    this.physics.add.collider(snowballs, platform, this.destroySnowball, null, this);
+    this.physics.add.collider(snowballs, player, this.degatSnowballJoueur, null, this);
+
+ //   this.physics.add.collider(fireball, platform);
     
- //   this.physics.add.collider(snowball, platformSnow);
+ //   this.physics.add.collider(fireball, platformSnow);
 
 
-    //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
+    //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar  
  //   this.physics.add.overlap(player,healthPowerUp , collectHealthPlayer, null, this);
 
     
     
     
-    this.physics.add.collider(player, snowball, hitBomb, null, this);
+      
+    this.physics.add.overlap(this.snowman, bombs, this.killSnowman, null, this);
     
-    this.physics.add.collider(player, roquettes, hitBomb, null, this);
+    this.physics.add.collider(player, roquettes, this.hitBomb, null, this);
     
-    this.physics.add.collider(player, platform, setSpeedPlatform, null, this);
+    this.physics.add.collider(player, platform, this.setSpeedPlatform, null, this);
+          
+    this.physics.add.collider(player, platformSnow, this.setSpeedPlatformSnow, null, this);
+    this.physics.add.collider(player, platformIce, this.setSpeedPlatformIce, null, this);
     
-    this.physics.add.collider(player, platformSnow, setSpeedPlatformSnow, null, this);
-    this.physics.add.collider(player, platformIce, setSpeedPlatformIce, null, this);
     
-    
-    
- 
+  
 }
 
-function update ()
-{
+  update (){
 
+    //console.log(this.snowman.x)
+      
+      // this.time.delayedCall(1000, this.lancerSnowballSnowman, null, this);
+      
+    
     //Autorise les pieces à tourner
     for (const coin of this.coins.children.entries) {
         coin.play('rotate', true);
     }
 
+      if(standing)
     // définie le contact du joueur avec un sol
-    var standing = player.body.blocked.down || player.body.touching.down;
-    
-    /*
-        if (this.input.gamepad.total === 0)
-    {
-        return;
-    }
-    
-    var pad = this.input.gamepad.getPad(0);
-
-
-        if (pad.axes.length)
-    {
-        var axisH = pad.axes[0].getValue();
-    
-
-        player.flipX = (axisH > 0);
-    }
-    
-    if(pad.axesX>0){
-        goRight();
-    }
-    if(pad.axesX<0){
-        goLeft();
-    }
-    */
+     standing = player.body.blocked.down || player.body.touching.down;
     
     
-   if( machineGunSnowballActive==true){
-       cooldownMachineGunSnowball--
+    
+   if( machineGunFireballActive==true){
+       cooldownMachineGunFireball--
    }
-    if(cooldownMachineGunSnowball<1 && machineGunSnowballActive==true ){
-      machineGunSnowballActive=false;
-      cooldownSnowball=120
-      cooldownMachineGunSnowball=360
+    if(cooldownMachineGunFireball<1 && machineGunFireballActive==true ){
+      machineGunFireballActive=false;
+      cooldownFireball=120
+      cooldownMachineGunFireball=360
         console.log("test")
     }
     
     
     
-    if(snowballPlayer == false){
-     delaiSnowballPlayer --
+    if(fireballPlayer == false){
+     delaiFireballPlayer --
     }
-    if (delaiSnowballPlayer <= 0 && snowballPlayer == false)  // eg, update every 10 seconds
+    if (delaiFireballPlayer <= 0 && fireballPlayer == false)  // eg, update every 10 seconds
   {
-    delaiSnowballPlayer = cooldownSnowball;
-    snowballPlayer = true;
+    delaiFireballPlayer = cooldownFireball;
+    fireballPlayer = true;
   }
     
          
-    
-/* 
-    if (cursors.up.isDown && player.body.touching.down)
-    {
-        player.setVelocityY(-330);
-    }
-    
-    if (cursors.down.isDown )
-    {
-        if(snowballPlayer == true){
-        snowballPlayer = false;
-        lancersnowball(player);
-        }
-    }
-    
-    
-        if (cursors.left.isDown)
-    {
-        player.setVelocityX(-250);
-
-        player.anims.play('left', true);
-    }
-    
-    
-    if (cursors.right.isDown)
-    {
-        player.setVelocityX(250);
-
-        player.anims.play('right', true);
-    }
-    
-    /*if (cursors.up.isDown && jumpingPlayer && jumpsPlayer > 0)
-    {
-        player.setVelocityY(-350);
-        jumpsPlayer--
-        jumpingPlayer = false
-    }*/
-    /*
-    if (cursors.up.isUp)
-    {
-        jumpingPlayer = true
-    }
-    
-    if (player.body.touching.down )
-    {
-        jumpsPlayer = 1
-    }
-    
-    if (cursors.left.isUp && cursors.right.isUp)
-    {
-         player.setVelocityX(0);
-
-        player.anims.play('turn');
-    }
-       if(cursors.up.isDown){
-         player.setVelocityY(-330);
-    }*/
 
 
-    
-    if (standing==true)
-    {
-        jumpingPlayer=false
-    }
-    
-  /*  if (keyZ.isDown && player.body.notTouching.down)
-    {
-  
-        if(doubleSautPlayer=false){
-            player.setVelocityY(-330);
-            doubleSautPlayer=true;
-        }
-    }*/
-
-   /* if(keyZ.isDown){
-        jump();
-    }*/
     
     if (cursors.right.isDown )
     {
-        if(snowballPlayer == true && snowballPowerUpActive==true){
-        snowballPlayer = false;
-        lancerSnowballRight(player);
+        if(fireballPlayer == true && fireballPowerUpActive==true){
+        fireballPlayer = false;
+        this.lancerFireballRight(player);
         } 
     }
     
     
     if (cursors.left.isDown )
     {
-        if(snowballPlayer == true && snowballPowerUpActive==true){
-        snowballPlayer = false;
-        lancerSnowballLeft(player);
+        if(fireballPlayer == true && fireballPowerUpActive==true){
+        fireballPlayer = false;
+        this.lancerFireballLeft(player);
         } 
     } 
     
     if (cursors.up.isDown )
     {
-        if(snowballPlayer == true && snowballPowerUpActive==true){
-        snowballPlayer = false;
-        lancerSnowballUp(player);
+        if(fireballPlayer == true && fireballPowerUpActive==true){
+        fireballPlayer = false;
+        this.lancerFireballUp(player);
         } 
     } 
     
         if (cursors.down.isDown )
     {
-        if(snowballPlayer == true && snowballPowerUpActive==true){
-        snowballPlayer = false;
-        lancerSnowballDown(player);
+        if(fireballPlayer == true && fireballPowerUpActive==true){
+        fireballPlayer = false;
+        this.lancerFireballDown(player);
         } 
     } 
     
@@ -522,11 +782,11 @@ function update ()
     
     
     
-    if (keyM.isDown && machineGunSnowballActive==false && machineGunSnowballUses >0)
+    if (keyM.isDown && machineGunFireballActive==false && machineGunFireballUses >0)
     {
-        machineGunSnowballActive=true;
-        cooldownSnowball=10
-        machineGunSnowballUses-=1;
+        machineGunFireballActive=true;
+        cooldownFireball=10
+        machineGunFireballUses-=1;
     } 
     
     
@@ -538,23 +798,31 @@ function update ()
     
     if (keyQ.isDown )
     {
-        goLeft();
+        this.goLeft();
     }
     if (keyD.isDown)
     {
-        goRight();
+        this.goRight();
     }
     
     
     
     
 
+    if(standing==false){
+        jumpingPlayer=true
+    }
+    
+    if (standing==true)
+    {
+        jumpingPlayer=false
+    }
 
     
     if (keyZ.isDown && jumpingPlayer==false)
     {
-        jumpingPlayer = true;
-        jump();
+        standing = false;
+        this.jump();
     }
     
 
@@ -562,13 +830,10 @@ function update ()
     
     if (keyZ.isUp)
     {
-        jumpingPlayer = true
+        standing = true
     }
     
-    if (player.body.touching.down )
-    {
-        jumpsPlayer = 1
-    }
+
     
     
     if (keyD.isUp && keyQ.isUp )
@@ -585,212 +850,157 @@ function update ()
     
     
     if (player.y>600){
-        death();
+        this.death();
     }
     
-    if (healthAmount<50.1){
-        snowballPowerUpActive=false;
+    if (froid.value<50.1){
+        fireballPowerUpActive=false;
     }
     
-    if (healthAmount<0.1){
-        death();
+    if (froid.value<0.1){
+        this.death();
     }
     
-    
 
 }
 
 
-    
-function lancerSnowballRight(player){
-        var bomb = bombs.create(player.x, player.y, 'snowball');
-        bomb.setBounce(0.9);
-        bomb.body.setAllowGravity(false);
-        bomb.setVelocity(700, 0);
-}
-
-function lancerSnowballLeft(player){
-      var bomb = bombs.create(player.x, player.y, 'snowball');
-        bomb.setBounce(0.9);
-        bomb.body.setAllowGravity(false);
-        bomb.setVelocity(-700, 0);
-}
-    
-
-function lancerSnowballUp(player){
-      var bomb = bombs.create(player.x, player.y, 'snowball');
-        bomb.setBounce(0.9);
-        bomb.body.setAllowGravity(false);
-        bomb.setVelocity(0, -700);
-}
-    
-function lancerSnowballDown(player){
-      var bomb = bombs.create(player.x, player.y, 'snowball');
-        bomb.setBounce(0.9);
-        bomb.body.setAllowGravity(false);
-        bomb.setVelocity(0, 700);
-}   
-    
-    
-function lancersnowball(player){
-
-
-         var bomb = bombs.create(player.x, player.y, 'snowball');
-        bomb.setBounce(0.9);
-        bomb.body.setAllowGravity(false);
-    
-        var directionSnowballPlayer = Math.round(Phaser.Math.Between(0,1))
-        
-        if(keyQ.isDown){
-            directionSnowballPlayer=-700;
-        }
-        else if(keyD.isDown){
-            directionSnowballPlayer=700;
-        }
-        else if(keyD.isUp && keyQ.isUp && keyZ.isUp && directionSnowballPlayer==1){
-            directionSnowballPlayer=700;
-        }
-        else if(keyD.isUp && keyQ.isUp && keyZ.isUp && directionSnowballPlayer==0){
-            directionSnowballPlayer=-700;
-        }
-    
-    
-        
-        if(cursors.left.isDown){
-            directionSnowballPlayer=-700;
-        }
-        else if(cursors.right.isDown){
-            directionSnowballPlayer=700;
-        }
-        else if(cursors.left.isUp && cursors.right.isUp && cursors.up.isUp  && directionSnowballPlayer==1){
-            directionSnowballPlayer=700;
-        }
-        else if(cursors.left.isUp && cursors.right.isUp && cursors.up.isUp && directionSnowballPlayer==0){
-            directionSnowballPlayer=-700;
-        }
-        
-        bomb.setVelocity(directionSnowballPlayer, 0);
-       
-    
-      }
- 
- 
-function destroySnowball(bomb){
-    bomb.disableBody(true, true);
   
+
 }
     
     
+    
+class Death extends Phaser.Scene {
 
-function collectHealthPlayer (powerUpHealth)
-{
-    powerUpHealth.disableBody(true, true);
-
-    //  Add and update the score
-    healthAmount = healthAmount+10;
-    if(healthAmount>100){
-        healthAmount=100;
+    constructor () {
+        super('Death');
     }
-    Health.innerHTML= healthAmount;
-    console.log('Power Up Health Récupéré')
-}
-    
-    
-function collectCoin(coin){
-   /* healthAmount-=10
-     Health.innerHTML=healthAmount*/
-    coin.disableBody(true, true);
-    totalCoins+=1;
-    totalPieces.innerHTML=totalCoins
-    console.log(totalCoins);
-      
-}
-    
-    
-    
-function collectPowerUpSnowball(powerUpSnowball){
-    powerUpSnowball.disableBody(true, true);
-    snowballPowerUpActive= true;
-    console.log('PowerUp snowball Récupéré') ;
-}
-    
- 
-    
-function contactDrapeau(){
-    
-    if(totalCoins>14){
-    console.log('Drapeau Débloqué')
-    this.physics.pause();
-    return;  
+        preload(){
+              this.load.image('deathScreen', 'assets/deathScreen.png');
+        }
+    create() {
+        
+        var gameOverScreen = this.add.image(600, 400, 'deathScreen').setScale(3);
+		this.add.text(0.5, 0.5, 'Death')
+      this.time.delayedCall(1500, this.switchDeathToLevel, null, this);
     }
-    else {
-        console.log('Vous n\'avez que ' + totalCoins +' pièces')
+    
+    switchDeathToLevel(){
+        
+          this.scene.start('Jeu');
+        
     }
-}    
-    
-function hitBomb (player, bomb)
-{
-    death();
-}
-
-   
-
- function setSpeedPlatform (player, platform) {
-     runSpeed = 1;
-     onPlatform = "platform"
-
-
-}
-    
- function setSpeedPlatformSnow (player, platform) {
-    
-     runSpeed = 0.25;
-     onPlatform = "snow"
-}
-    
- function setSpeedPlatformIce (player, platform) {
-   
-   //  runSpeed = 0.25;
-     onPlatform = "ice"
 }
     
     
-function goRight(){
     
-    player.setVelocityX(250*runSpeed);
-    player.anims.play('right', true);
-   // cameraFollowPlayer();
-}
+    
+    
+class GameOver extends Phaser.Scene {
 
-    
-    
-function goLeft(){
-    player.setVelocityX(-250*runSpeed);
-    player.anims.play('left', true);
-}
- 
-    
-function jump(){
-    player.setVelocityY(-500);
-}
-
-    
-    
-  
-function cameraFollowPlayer() {
-   // this.physics.world.bounds.setPosition(this.cameras.main.worldView.x, 0);
-
-    if (player.body.position.x + player.body.width / 2 > this.cameras.main.midPoint.x &&
-        !this.cameras.main._follow) {
-        this.cameras.main.startFollow(this.sprite);
+    constructor () {
+        super('GameOver');
     }
-}    
+        preload(){
+              this.load.image('gameOverScreen', 'assets/gameOverScreen.png');
+        }
+    create() {
+        
+        var gameOverScreen = this.add.image(600, 400, 'gameOverScreen').setScale(3);
+		this.add.text(0.5, 0.5, 'GAME OVER')
+      this.time.delayedCall(2000, this.switchGameOverToMenu, null, this);
+    }
     
-    
-function death(){
-    this.scene.restart();
+    switchGameOverToMenu(){
+        
+ machineGunFireballActive=false,
+ cooldownMachineGunFireball = 360,
+ machineGunFireballUses = 0,
+ cooldownFireball = 120,
+ onPlatform ="",
+ runSpeed = 1,
+ totalCoins=0,
+ jumpingPlayer = true,
+ fireballPowerUpActive = false,
+ fireballPlayer = true ,
+ delaiFireballPlayer = 120
+    froid.value = 200;
+	froidNombre.innerHTML = froid.value;
+        level=""
+        viesRestantes=5
+          this.scene.start('Menu');
+        
+    }
 }
+    
 
+    
+    var config = {
+
+    type: Phaser.AUTO,
+    width: 1280,
+    height: 720,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 1000 },
+            debug: false,
+            fps: 60
+        },
+    },
+    input: {
+        gamepad: true
+    },
+    scene: [Menu, Jeu, Death, GameOver]
+
+};
+
+
+var level="level1";
+
+var machineGunFireballActive=false;
+var cooldownMachineGunFireball = 360;
+var machineGunFireballUses = 3;
+var cooldownFireball = 120;
+var onPlatform ="";
+var bomb;
+var snowball;
+var runSpeed = 1;
+var totalCoins=0;
+var player;
+var healthAmount = 100;
+var health;
+var bombs;
+var snowballs;
+var platforms;
+var cursors;
+var snowman;
+var fireball;
+var roquette;
+var scoreText;
+var roquettes;
+var viesRestantes=5;
+var jumpingPlayer = true
+
+var fireballPowerUpActive = true
+var fireballPlayer = true
+    
+var delaiFireballPlayer = 120;
+var standing;
+var keyM
+var keyZ;
+var keyS;
+var keyD;
+var keyQ;
+
+var game = new Phaser.Game(config);
+
+var coins;
+
+var playerInvincible=false;
+    
+        </script>
 </script>
 
 </body>
