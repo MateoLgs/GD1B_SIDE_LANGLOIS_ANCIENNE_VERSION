@@ -23,7 +23,15 @@
      
     
     
+    
+    
 
+    
+    
+    
+    
+    
+    
     
     
     
@@ -204,8 +212,17 @@ class Jeu extends Phaser.Scene{
     
     if(totalCoins>14){
     console.log('Drapeau Débloqué')
-    this.physics.pause();
-    return;  
+        
+    if(level=="level3"){level="level4"} 
+    if(level=="level2"){level="level3"}  
+    if(level=="level1"){level="level2"}    
+  
+    
+        
+    console.log(level)   
+    totalCoins=0;
+    totalPieces.innerHTML=coins;
+    this.scene.restart();
     }
     else {
         console.log('Vous n\'avez que ' + totalCoins +' pièces')
@@ -315,8 +332,7 @@ class Jeu extends Phaser.Scene{
   }
     
   death(){
-      
-      viesRestantes-=1;
+
       vies.innerHTML=viesRestantes;
     if(viesRestantes>0){
      this.scene.start('Death');
@@ -353,8 +369,10 @@ class Jeu extends Phaser.Scene{
 
       
 
-     this.load.tilemapTiledJSON('map1', './assets/level1.json');
-     this.load.tilemapTiledJSON('map2', './assets/level2.json');
+     this.load.tilemapTiledJSON('level1', './assets/level1.json');
+     this.load.tilemapTiledJSON('level2', './assets/level2.json');
+     this.load.tilemapTiledJSON('level3', './assets/level3.json');
+     this.load.tilemapTiledJSON('level4', './assets/level4.json');
    
 
 }
@@ -362,15 +380,21 @@ class Jeu extends Phaser.Scene{
   create (){
    
      if(level=="level1"){
-           this.map = this.make.tilemap({ key: 'map1' });
+           this.map = this.make.tilemap({ key: 'level1' });
       }
       if(level=="level2"){
-         this.map = this.make.tilemap({ key: 'map2' });
+         this.map = this.make.tilemap({ key: 'level2' });
+      }     
+      if(level=="level3"){
+           this.map = this.make.tilemap({ key: 'level3' });
+      }
+      if(level=="level4"){
+         this.map = this.make.tilemap({ key: 'level4' });
       }
     
     
     this.tileset = this.map.addTilesetImage('tileset_gutter', 'tiles');
-    //var background = this.map.createStaticLayer('back', this.tileset, 0, 0);
+    //var background = this.map.createStaticLayer('background', this.tileset, 0, 0);
     var platform = this.map.createDynamicLayer('platform', this.tileset, 0, 0);
     var platformSnow = this.map.createDynamicLayer('platformSnow', this.tileset, 0, 0);
     var platformIce = this.map.createDynamicLayer('platformIce', this.tileset, 0, 0);
@@ -381,19 +405,20 @@ class Jeu extends Phaser.Scene{
    platformIce.setCollisionByExclusion(-1, true);
 
  
-    player = this.physics.add.sprite(25, 220, 'dude1');
+    player = this.physics.add.sprite(32, 0, 'dude1');
+    player.setCollideWorldBounds(false);
     
-    
-    this.cameras.main.zoom = 2;
+      this.cameras.main.zoom = 2;
   
     this.cursors = this.input.keyboard.createCursorKeys();
     
-    //if(player.y<0){
-    //   this.cameras.main.startFollow(player, true, 1, 1, 0, -220); 
-   // }
-    //else {
-        this.cameras.main.startFollow(player, true, 1, 0, 0, 0);  
-   // }
+
+        //this.cameras.main.startFollow(player, true, 1, 0, 0, 0);  
+ 
+      
+    this.cameras.main
+        .setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels)
+        .startFollow(player);
     
     
       
@@ -613,8 +638,8 @@ class Jeu extends Phaser.Scene{
 
     //  Player physics properties. Give the little guy a slight bounce.
    
-    player.setBounce(0.1);
-    player.setCollideWorldBounds(false);
+
+
 
 
     //  Our player animations, turning, walking left and walking right.
@@ -661,7 +686,6 @@ class Jeu extends Phaser.Scene{
     fireball = this.physics.add.group();
     roquettes = this.physics.add.group();
     //  The score
-    scoreText = this.add.text(0, -100, 'Level 1', { fontSize: '32px', fill: '#FFF' });
 
     
     //  Collide the player and the stars with the platforms
@@ -864,9 +888,6 @@ class Jeu extends Phaser.Scene{
 
 }
 
-
-  
-
 }
     
     
@@ -887,15 +908,31 @@ class Death extends Phaser.Scene {
     }
     
     switchDeathToLevel(){
-        
+ machineGunFireballActive=false,
+ cooldownMachineGunFireball = 360,
+ machineGunFireballUses = 0,
+ cooldownFireball = 120,
+ onPlatform ="",
+ runSpeed = 1,
+ totalCoins=0,
+ jumpingPlayer = true,
+ fireballPowerUpActive = false,
+ fireballPlayer = true ,
+ delaiFireballPlayer = 120
+    froid.value = 200;
+	froidNombre.innerHTML = froid.value;
+
+
+        coins=0
+        totalPieces.innerHTML=coins
+        froid.value = 200;
+	  froidNombre.innerHTML = froid.value
+      viesRestantes-=1;
           this.scene.start('Jeu');
         
     }
 }
-    
-    
-    
-    
+       
     
 class GameOver extends Phaser.Scene {
 
@@ -914,6 +951,45 @@ class GameOver extends Phaser.Scene {
     
     switchGameOverToMenu(){
         
+         machineGunFireballActive=false,
+ cooldownMachineGunFireball = 360,
+ machineGunFireballUses = 0,
+ cooldownFireball = 120,
+ onPlatform ="",
+ runSpeed = 1,
+ totalCoins=0,
+ jumpingPlayer = true,
+ fireballPowerUpActive = false,
+ fireballPlayer = true ,
+ delaiFireballPlayer = 120
+    froid.value = 200;
+	froidNombre.innerHTML = froid.value;
+        level="level1"
+        viesRestantes=5
+        coins=0
+        totalPieces.innerHTML=coins
+        froid.value = 200;
+	  froidNombre.innerHTML = froid.value
+      viesRestantes-=1;
+          this.scene.start('Menu');
+        
+    }
+}
+    
+
+   /* 
+class NextLevel extends Phaser.Scene {
+
+    constructor () {
+        super('NextLevel');
+    }
+
+    create() {
+    t
+      this.time.delayedCall(1500, this.switchDeathToLevel, null, this);
+    }
+    
+    switchDeathToLevel(){
  machineGunFireballActive=false,
  cooldownMachineGunFireball = 360,
  machineGunFireballUses = 0,
@@ -928,13 +1004,19 @@ class GameOver extends Phaser.Scene {
     froid.value = 200;
 	froidNombre.innerHTML = froid.value;
         level=""
-        viesRestantes=5
-          this.scene.start('Menu');
+
+        coins=0
+        totalPieces.innerHTML=coins
+        froid.value = 200;
+	  froidNombre.innerHTML = froid.value
+      viesRestantes-=1;
+          this.scene.start('Jeu');
         
     }
 }
+   */  
     
-
+    
     
     var config = {
 
@@ -980,7 +1062,7 @@ var fireball;
 var roquette;
 var scoreText;
 var roquettes;
-var viesRestantes=5;
+var viesRestantes=10;
 var jumpingPlayer = true
 
 var fireballPowerUpActive = true
