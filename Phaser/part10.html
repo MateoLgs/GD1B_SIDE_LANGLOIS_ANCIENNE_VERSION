@@ -12,27 +12,16 @@
     </style>
 </head>
 <body>
-    <div>
-        <div>Vies : <span id="vies">5</span></div>
-<div>Pièces : <span id="totalPieces">0</span></div>
+<div>
+<div>Vies : <span id="vies">10</span></div>
+ <div>Pièces : <span id="totalPieces">0</span></div>
 <span>Froid : </span>
-<label id="froidNombre">200</label><span> % </span>
-<progress  value="200" max="200" id="froid"></progress>
-
+<label id="froidNombre">0 </label><span> %</span>
+<progress  value="0" max="100" id="froid"></progress>
+    </div>
 <script type="text/javascript">
      
-    
-    
-    
-    
 
-    
-    
-    
-    
-    
-    
-    
     
     
 class Menu extends Phaser.Scene {
@@ -44,13 +33,30 @@ class Menu extends Phaser.Scene {
               this.load.image('Menu', 'assets/menuScreen.jpg');
               this.load.image('menuLevel1Button', 'assets/menuLevel1Button.png');
               this.load.image('menuLevel2Button', 'assets/menuLevel2Button.png');
+              this.load.image('switchOn', 'assets/switchOn.png');
+              this.load.image('switchOff', 'assets/switchOff.png');
         }
     create() {
 
         var menuBackground = this.add.image(600, 400, 'Menu');
         var menuLevel1Button = this.add.image(400, 400, 'menuLevel1Button').setScale(0.5).setInteractive();
         var menuLevel2Button = this.add.image(800, 400, 'menuLevel2Button').setScale(0.5).setInteractive();
-
+        var menuHardcoreModeOn = this.add.image(1200, 50, 'switchOn').setScale(0.125).setInteractive().setAlpha(0);
+        var menuHardcoreModeOff = this.add.image(1200, 50, 'switchOff').setScale(0.125).setInteractive();
+     
+  menuHardcoreModeOff.on('pointerdown', () => {
+      menuHardcoreModeOn.setAlpha(1)
+      menuHardcoreModeOff.setAlpha(0)
+      hardcoreMode="on";
+        })  
+  
+        
+    menuHardcoreModeOn.on('pointerdown', () => {
+      menuHardcoreModeOff.setAlpha(1)
+      menuHardcoreModeOn.setAlpha(0)
+      hardcoreMode="off";
+        })   
+        
   menuLevel1Button.on('pointerdown', () => {
       this.choixMenulevel1Button();
         }) 
@@ -67,7 +73,7 @@ class Menu extends Phaser.Scene {
     }
 
     choixMenulevel2Button(){
-        level="level2"
+        level="tutoriel"
       this.scene.start('Jeu');
     }
     
@@ -83,9 +89,33 @@ class Jeu extends Phaser.Scene{
       }
 
     
-  lancerSnowballSnowman(snowman){
-       var snowball = snowballs.create(this.snowman.x, this.snowman.y, 'snowball');
-        snowball.setVelocity(0, 200);
+  lancerSnowballYeti(yeti){
+
+      if(hardcoreMode=="off"){
+          console.log("hardcore off")
+                for (const yeti of this.yetis.children.entries) {
+              var snowball = snowballs.create(yeti.x, yeti.y, 'snowball');
+        if(player.x<yeti.x){
+        snowball.setVelocity(-500, -500);
+        }
+        else if(player.x>yeti.x){
+        snowball.setVelocity(500, -500);
+        }
+      }
+      }
+      
+        if(hardcoreMode=="on"){
+                    console.log("hardcore on")
+      for (const yeti of this.yetis.children.entries) {
+              var snowball = snowballs.create(yeti.x, yeti.y, 'snowball');
+        if(player.x<yeti.x){
+        snowball.setVelocity(Phaser.Math.FloatBetween(-400, -800), Phaser.Math.FloatBetween(-200, -800));
+        }
+        else if(player.x>yeti.x){
+        snowball.setVelocity(Phaser.Math.FloatBetween(400, 800), Phaser.Math.FloatBetween(-200, -800));
+        }
+      }
+      }
   }
     
   killSnowman(snowman, fireball){
@@ -120,7 +150,7 @@ class Jeu extends Phaser.Scene{
         bomb.setVelocity(0, 700);
 }   
    
-  lancerfireball(player){
+  /*lancerfireball(player){
 
 
          var bomb = bombs.create(player.x, player.y, 'fireball');
@@ -160,7 +190,7 @@ class Jeu extends Phaser.Scene{
         bomb.setVelocity(directionFireballPlayer, 0);
        
     
-      }
+      }*/
  
   destroyFireball(bomb){
     bomb.destroy();
@@ -178,13 +208,28 @@ class Jeu extends Phaser.Scene{
     
   showPlatformInvisible(platformInvisble){
       platformInvisble.setAlpha(1);
+            if(player.body.blocked.down || player.body.touching.down){
+       standing=true
+      }
   }    
+   
+  showPicsInvisible(PicsInvisible){
+         
+
+    if(playerInvincible==false){
+ 
+        this.death();
+
+      }
+
+      PicsInvisible.setAlpha(1);
+  } 
     
   collectHealthPlayer(powerUpHealth){
     powerUpHealth.destroy();
 
     //  Add and update the score
-    froid.value += 30;
+    froid.value -= 20;
 	froidNombre.innerHTML = froid.value;
  
 }
@@ -205,24 +250,33 @@ class Jeu extends Phaser.Scene{
         machineGunFireballUses+=1;
     }
     fireballPowerUpActive= true;
-    console.log('PowerUp fireball Récupéré') ;
 }
     
   contactDrapeau(){
     
     if(totalCoins>14){
-    console.log('Drapeau Débloqué')
-        
-    if(level=="level3"){level="level4"} 
-    if(level=="level2"){level="level3"}  
-    if(level=="level1"){level="level2"}    
-  
-    
-        
     console.log(level)   
     totalCoins=0;
     totalPieces.innerHTML=coins;
-    this.scene.restart();
+    if(level=="level4"){
+        this.scene.start("Victoire");
+    } 
+    if(level=="level3"){
+        level="level4"
+
+        this.scene.restart();
+    } 
+    if(level=="level2"){
+        level="level3"
+ 
+        this.scene.restart();
+    }  
+    if(level=="level1"){
+        level="level2"
+           
+        this.scene.restart();
+    }    
+
     }
     else {
         console.log('Vous n\'avez que ' + totalCoins +' pièces')
@@ -231,19 +285,87 @@ class Jeu extends Phaser.Scene{
 
   degatSnowmanJoueur(snowman){
     snowman.destroy();
-      if(playerInvincible==false){
-     froid.value -= 100;
+      if(hardcoreMode=="on"){
+          this.death();
+      }
+      if(playerInvincible==false && hardcoreMode=="off"){
+     froid.value += 50;
 	froidNombre.innerHTML = froid.value;
       }
-      this.playerGoInvincible();
+             this.bounce();
+
+      
   }
     
-  degatSnowballJoueur(snowball){
-    snowball.destroy();
-    if(playerInvincible==false){
-     froid.value -= 50;
+  contactYetiJoueur(yeti){
+
+       yeti.destroy();
+       this.bounce();
+  }
+    
+  bounce(){
+     playerCanResetVelocity=false
+        this.input.enabled = false;
+        keyD.reset();
+        keyQ.reset();
+        keyZ.reset();  
+      this.playerGoInvincible();
+            if(player.body.touching.right){
+           player.setVelocityX(-250);
+      }
+      else if(player.body.touching.down){
+           player.setVelocityY(-250);
+      }
+      else if(player.body.touching.left){
+           player.setVelocityX(+250);
+      }
+     
+        this.time.delayedCall(400, this.inputEnabled, null, this);   
+  }
+    
+   bouncePlatformMontagne(){
+       
+
+ 
+    if(player.body.blocked.right){
+             playerCanResetVelocity=false
+        this.input.enabled = false;
+        keyD.reset();
+        keyQ.reset();
+        keyZ.reset(); 
+           player.setVelocityX(-150);
+      }
+       if(player.body.blocked.left){
+                playerCanResetVelocity=false
+        this.input.enabled = false;
+        keyD.reset();
+        keyQ.reset();
+        keyZ.reset(); 
+           player.setVelocityX(+150);
+      }
+    console.log("montagne")
+        this.time.delayedCall(400, this.inputEnabled, null, this);  
+  }    
+    
+  inputEnabled(){
+      player.setVelocityX(0);
+      player.anims.play('turn');
+       this.input.enabled = true;
+            playerCanResetVelocity=true
+  }
+    
+  degatSnowballJoueur(player, snowball){
+  snowball.disableBody(true, true);
+      if(hardcoreMode=="on" ){
+          this.death();
+      }
+    if(playerInvincible==false && hardcoreMode=="off"){
+     froid.value += 25;
 	froidNombre.innerHTML = froid.value;
+        this.playerGoInvincible();
     }
+                
+
   }
     
   hitBomb (player, bomb){
@@ -256,8 +378,6 @@ class Jeu extends Phaser.Scene{
       if(player.body.blocked.down || player.body.touching.down){
        standing=true
       }
-
-
 }
     
   setSpeedPlatformSnow (player, platform) {
@@ -275,7 +395,7 @@ class Jeu extends Phaser.Scene{
       }
   player.setDrag(1)
 
-     onPlatform = "ice"
+    
       console.log(onPlatform)
 }
     
@@ -331,16 +451,52 @@ class Jeu extends Phaser.Scene{
       player.setTint(0xff0000)
   }
     
-  death(){
+  destroyFireballSnowball(bomb, snowball){
+      bomb.destroy();
+      snowball.destroy();
+  }
+    
+ killGoomba() {
+     console.log("goomba die")
+    for (const goomba of this.goombas.children.entries) {
+        if (goomba.body.touching.up) {
+            goomba.isDed = true;
+            goomba.play('goombaDie', true);
+            goomba.on('animationcomplete', () => goomba.destroy());
 
-      vies.innerHTML=viesRestantes;
+            increaseScore(.5);
+
+            this.scene.player.sprite.setVelocity(0, -350);
+            this.scene.player.sprite.play('jump');
+        };
+    }
+}
+    
+  death(){
+      this.input.keyboard.shutdown();
+        player.setVelocityX(0);
+        player.anims.play('turn');
+            player.setTint(0xff0000)
+      this.physics.pause();
+        keyD.reset();
+        keyQ.reset();
+        keyZ.reset(); 
+      this.time.delayedCall(1000, this.mort, null, this);
+
+    }
+
+  mort(){
+         
+    viesRestantes-=1;
+    vies.innerHTML=viesRestantes;
     if(viesRestantes>0){
+   player.setVelocityX(0);
      this.scene.start('Death');
     }
     if(viesRestantes==0){
     this.scene.start('GameOver');
-    }
-    }
+    } 
+}
 
   preload (){
     
@@ -350,15 +506,18 @@ class Jeu extends Phaser.Scene{
     var powerUpSnow = this.load.image('powerUpSnow', 'assets/iceCube.png');
     var powerUpHealth = this.load.image('powerUpHealth', 'assets/powerUpHealth.png');
     var platformFake = this.load.image('platformFake', 'assets/platformFakeTile.png');
-    var platformFake = this.load.image('platformInvisible', 'assets/platformFakeTile.png');
+    var platformInvisible = this.load.image('platformInvisible', 'assets/platformFakeTile.png');
+    var picsInvisible = this.load.image('picsInvisible', 'assets/picsInvisible.png');
     this.load.image('fireball', 'assets/fireball.png');
     this.load.image('snowball', 'assets/snowball.png');
+    this.load.image('yeti', 'assets/yeti.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.image('sky', 'assets/sky.png');
     this.load.image('flag', 'assets/flag.png');
     this.load.image('snowman', 'assets/snowman.png');
     this.load.image('ground', 'assets/platform.png');
     this.load.image('health', 'assets/star.png', { width: 10,  height: 20,});
+    this.load.image('snowstorm', 'assets/snowstorm.png');
     this.load.spritesheet('dude1', 'assets/dude1.png', { frameWidth: 32, frameHeight: 48 });
     
     
@@ -369,6 +528,7 @@ class Jeu extends Phaser.Scene{
 
       
 
+     this.load.tilemapTiledJSON('tutoriel', './assets/tutoriel.json');
      this.load.tilemapTiledJSON('level1', './assets/level1.json');
      this.load.tilemapTiledJSON('level2', './assets/level2.json');
      this.load.tilemapTiledJSON('level3', './assets/level3.json');
@@ -378,7 +538,10 @@ class Jeu extends Phaser.Scene{
 }
 
   create (){
-   
+   if(level=="tutoriel"){
+           this.map = this.make.tilemap({ key: 'tutoriel' });
+       playerInvincible=true;
+      }
      if(level=="level1"){
            this.map = this.make.tilemap({ key: 'level1' });
       }
@@ -394,20 +557,38 @@ class Jeu extends Phaser.Scene{
     
     
     this.tileset = this.map.addTilesetImage('tileset_gutter', 'tiles');
-    //var background = this.map.createStaticLayer('background', this.tileset, 0, 0);
+   // var background = this.map.createStaticLayer('background', this.tileset, 0, 0).setScale(1);
     var platform = this.map.createDynamicLayer('platform', this.tileset, 0, 0);
+    var platformMontagne = this.map.createDynamicLayer('platformMontagne', this.tileset, 0, 0);
     var platformSnow = this.map.createDynamicLayer('platformSnow', this.tileset, 0, 0);
     var platformIce = this.map.createDynamicLayer('platformIce', this.tileset, 0, 0);
+    //const texteTuto = this.map.getObjectLayer('texteTuto').objects;
 
   
    platform.setCollisionByExclusion(-1, true);
+   platformMontagne.setCollisionByExclusion(-1, true);
    platformSnow.setCollisionByExclusion(-1, true);
    platformIce.setCollisionByExclusion(-1, true);
 
  
-    player = this.physics.add.sprite(32, 0, 'dude1');
+    player = this.physics.add.sprite(32, 0, 'dude1').setScale(0.75);
     player.setCollideWorldBounds(false);
     
+      
+    var snowstorm = this.physics.add.sprite(-900, 0, 'snowstorm').setOrigin(0, 0);
+      if(hardcoreMode=="off"){
+        snowstorm.body.velocity.x=10;
+      }
+      if(hardcoreMode=="on"){
+        snowstorm.body.velocity.x=17;
+      }
+  
+    snowstorm.body.allowGravity = false
+
+   
+      
+      
+      
       this.cameras.main.zoom = 2;
   
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -421,18 +602,83 @@ class Jeu extends Phaser.Scene{
         .startFollow(player);
     
     
+    ///////////////////////////////////////
+    ////////////Goomba////////////////////
+      
+      
+      this.anims.create({
+    key: 'goombaRun',
+    frames: this.anims.generateFrameNames('atlas', {
+        prefix: 'mario-atlas_',
+        start: 11,
+        end: 12,
+    }),
+    frameRate: 15,
+    repeat: -1
+});
+
+this.anims.create({
+    key: 'goombaDie',
+    frames: [{ key: 'atlas', frame: 'mario-atlas_10' }],
+    frameRate: 10,
+    hideOnComplete: true
+});
       
       
       
+
+     this.goombas = this.physics.add.group(); 
+   
+     const goombaObjects = this.map.getObjectLayer('goomba').objects;
+
+
+    for (const goomba of goombaObjects) {
+    this.goombas.create(goomba.x, goomba.y, 'atlas')
+        .setOrigin(0.5,0.5)
+        .setDepth(-1)
+        .setScale(1.5);
+}
       
+    
+
+    
+    for (const goomba of this.goombas.children.entries) {
+      goomba.direction = 'RIGHT';
+        goomba.isDed = false;
+}  
+   this.collider = this.physics.add.collider(player, this.goombas, this.death, null, this)
+   this.physics.add.collider(this.goombas, platform);
+   this.physics.add.collider(this.goombas, platformIce);
+   this.physics.add.collider(this.goombas, platformSnow);
+   this.physics.add.collider(this.goombas, platformMontagne);
+   
+    ///////////////////////////////////////
+    ////////////picsInvisible////////////////////
+      
+    const picsInvisibleObjects = this.map.getObjectLayer('picsInvisible').objects;
+    this.picsInvisible = this.physics.add.group({
+            immovable: true,
+            allowGravity: false
+        });
+
+    for (const picsInvisible of picsInvisibleObjects) {
+    this.picsInvisible.create(picsInvisible.x+8, picsInvisible.y-3, 'picsInvisible').setScale(0.5).setAlpha(0)
+        .setOrigin(0.5,0.5)
+        .setDepth(-1)
+    }
+
+    for (const picsInvisible of this.picsInvisible.children.entries) {
+    picsInvisible.collider = this.physics.add.collider(picsInvisible, player, this.showPicsInvisible, null, this);
+    
+}      
       
       
           
      ///////////////////////////////////////
     ////////////platformInvisible////////////////////
       
-     const platformInvisibleObjects = this.map.getObjectLayer('platformInvisible').objects;
-     this.platformInvisible = this.physics.add.group({
+    const platformInvisibleObjects = this.map.getObjectLayer('platformInvisible').objects;
+    this.platformInvisible = this.physics.add.group({
             immovable: true,
             allowGravity: false
         });
@@ -444,9 +690,6 @@ class Jeu extends Phaser.Scene{
      
     }
       
-       
-
-    
     for (const platformInvisible of this.platformInvisible.children.entries) {
     platformInvisible.collider = this.physics.add.collider(platformInvisible, player, this.showPlatformInvisible, null, this);
     
@@ -456,8 +699,8 @@ class Jeu extends Phaser.Scene{
      ///////////////////////////////////////
     ////////////platformFake////////////////////
 
-     const platformFakeObjects = this.map.getObjectLayer('platformFake').objects;
-     this.platformFake = this.physics.add.group({
+    const platformFakeObjects = this.map.getObjectLayer('platformFake').objects;
+    this.platformFake = this.physics.add.group({
             immovable: true,
             allowGravity: false
         });
@@ -468,17 +711,35 @@ class Jeu extends Phaser.Scene{
         .setDepth(-1)
      
     }
-      
-       
 
-    
     for (const platformFake of this.platformFake.children.entries) {
     platformFake.collider = this.physics.add.overlap(platformFake, player, this.destroyPlatformFake, null, this);
     
 }  
       
+    ///////////////////////////////////////
+    ////////////Yeti////////////////////
+
+     const yetiObjects = this.map.getObjectLayer('yeti').objects;
+     this.yetis = this.physics.add.group();
+
+    for (const yeti of yetiObjects) {
+    this.yetis.create(yeti.x, yeti.y-20, 'yeti').setScale(0.25)
+        .setOrigin(0.5,0.5)
+        .setDepth(-1);
+}
       
-      
+    
+
+    
+    for (const yeti of this.yetis.children.entries) {
+    yeti.collider = this.physics.add.overlap(yeti, player, this.contactYetiJoueur, null, this);
+    yeti.direction = 'RIGHT';
+}  
+   this.physics.add.collider(this.yetis, platform);
+   this.physics.add.collider(this.yetis, platformIce);
+   this.physics.add.collider(this.yetis, platformSnow);
+   this.physics.add.collider(this.yetis, platformMontagne);
       
       
      ///////////////////////////////////////
@@ -491,7 +752,7 @@ class Jeu extends Phaser.Scene{
         });
 
     for (const snowman of snowmanObjects) {
-    this.snowman.create(snowman.x, snowman.y-15, 'snowman').setScale(0.05)
+    this.snowman.create(snowman.x, snowman.y-35, 'snowman').setScale(0.05)
         .setOrigin(0.5,0.5)
         .setDepth(-1);
 }
@@ -563,8 +824,8 @@ class Jeu extends Phaser.Scene{
 
     
      ///////////////////////////////////////
-    ////////////PowerUpSnow////////////
-    
+    ////////////PowerUpHealth////////////
+    if(hardcoreMode=="off"){
     const powerUpHealthObjects = this.map.getObjectLayer('powerUpHealth').objects;
      this.powerUpHealth = this.physics.add.group({
             immovable: true,
@@ -583,6 +844,7 @@ class Jeu extends Phaser.Scene{
     for (const powerUpHealth of this.powerUpHealth.children.entries) {
     powerUpHealth.collider = this.physics.add.overlap(powerUpHealth, player, this.collectHealthPlayer, null, this);
 }
+    }
     
         ///////////////////////////////////////
         ////////////arrivée////////////////////
@@ -695,11 +957,14 @@ class Jeu extends Phaser.Scene{
     this.physics.add.collider(bombs, platform, this.destroyFireball, null, this);
     this.physics.add.collider(bombs, platformIce, this.destroyFireball, null, this);
     this.physics.add.collider(bombs, platformSnow, this.destroyFireball, null, this);
+    this.physics.add.collider(bombs, snowballs, this.destroyFireballSnowball, null, this);
       
+    this.physics.add.collider(player, this.goomba, this.death, null, this);
+
 
       
-    this.physics.add.collider(snowballs, platform, this.destroySnowball, null, this);
-    this.physics.add.collider(snowballs, player, this.degatSnowballJoueur, null, this);
+   // this.physics.add.collider(snowballs, platform, this.destroySnowball, null, this);
+    this.physics.add.overlap(snowballs, player, this.degatSnowballJoueur, null, this);
 
  //   this.physics.add.collider(fireball, platform);
     
@@ -718,6 +983,8 @@ class Jeu extends Phaser.Scene{
     this.physics.add.collider(player, roquettes, this.hitBomb, null, this);
     
     this.physics.add.collider(player, platform, this.setSpeedPlatform, null, this);
+      
+    this.physics.add.collider(player, platformMontagne, this.bouncePlatformMontagne, null, this);
           
     this.physics.add.collider(player, platformSnow, this.setSpeedPlatformSnow, null, this);
     this.physics.add.collider(player, platformIce, this.setSpeedPlatformIce, null, this);
@@ -727,10 +994,60 @@ class Jeu extends Phaser.Scene{
 }
 
   update (){
+      
+    
+      
+      
+/////////////////Bouger goomba//////////////////////
+ for (const goomba of this.goombas.children.entries) {
+        if (goomba.body.blocked.right) {
+            goomba.direction = 'LEFT';
+        }
+
+        if (goomba.body.blocked.left) {
+            goomba.direction = 'RIGHT';
+        }
+
+        if (goomba.direction === 'RIGHT') {
+            goomba.setVelocityX(300);
+        } else {
+            goomba.setVelocityX(-300);
+        }
+
+        !goomba.isDed && goomba.play('goombaRun', true);
+
+    }
+      
+ for (const yeti of this.yetis.children.entries) {
+        if (yeti.body.blocked.right) {
+            yeti.direction = 'LEFT';
+        }
+
+        if (yeti.body.blocked.left) {
+            yeti.direction = 'RIGHT';
+        }
+
+        if (yeti.direction === 'RIGHT') {
+            yeti.setVelocityX(150);
+        } else {
+            yeti.setVelocityX(-150);
+        }
+
+       // !goomba.isDed && goomba.play('goombaRun', true);
+
+    }
+
+
+
 
     //console.log(this.snowman.x)
-      
-      // this.time.delayedCall(1000, this.lancerSnowballSnowman, null, this);
+      cooldownSnowball--
+      if(cooldownSnowball<=0){
+                    cooldownSnowball=90
+          this.lancerSnowballYeti();
+
+      }
+       //this.time.delayedCall(1000, this.lancerSnowballSnowman, null, this);
       
     
     //Autorise les pieces à tourner
@@ -749,9 +1066,9 @@ class Jeu extends Phaser.Scene{
    }
     if(cooldownMachineGunFireball<1 && machineGunFireballActive==true ){
       machineGunFireballActive=false;
-      cooldownFireball=120
+      
+        cooldownFireball=120
       cooldownMachineGunFireball=360
-        console.log("test")
     }
     
     
@@ -820,7 +1137,7 @@ class Jeu extends Phaser.Scene{
     
     
     
-    if (keyQ.isDown )
+    if (keyQ.isDown)
     {
         this.goLeft();
     }
@@ -860,7 +1177,7 @@ class Jeu extends Phaser.Scene{
 
     
     
-    if (keyD.isUp && keyQ.isUp )
+    if (keyD.isUp && keyQ.isUp && playerCanResetVelocity==true)
     {
             
         player.setVelocityX(0);
@@ -877,11 +1194,12 @@ class Jeu extends Phaser.Scene{
         this.death();
     }
     
-    if (froid.value<50.1){
-        fireballPowerUpActive=false;
+    if (froid.value<50.1 && machineGunFireballActive==false && hardcoreMode=="on"){
+
+      cooldownFireball=240
     }
     
-    if (froid.value<0.1){
+    if (froid.value>99.9){
         this.death();
     }
     
@@ -902,12 +1220,19 @@ class Death extends Phaser.Scene {
         }
     create() {
         
-        var gameOverScreen = this.add.image(600, 400, 'deathScreen').setScale(3);
+        var gameOverScreen = this.add.image(640, 360, 'deathScreen').setScale(2.2);
 		this.add.text(0.5, 0.5, 'Death')
       this.time.delayedCall(1500, this.switchDeathToLevel, null, this);
     }
     
     switchDeathToLevel(){
+
+        keyD.reset();
+        keyQ.reset();
+        keyZ.reset();        
+        
+        
+playerInvincible=false;
  machineGunFireballActive=false,
  cooldownMachineGunFireball = 360,
  machineGunFireballUses = 0,
@@ -919,15 +1244,13 @@ class Death extends Phaser.Scene {
  fireballPowerUpActive = false,
  fireballPlayer = true ,
  delaiFireballPlayer = 120
-    froid.value = 200;
+    froid.value = 0;
 	froidNombre.innerHTML = froid.value;
-
+ 
 
         coins=0
         totalPieces.innerHTML=coins
-        froid.value = 200;
-	  froidNombre.innerHTML = froid.value
-      viesRestantes-=1;
+
           this.scene.start('Jeu');
         
     }
@@ -940,17 +1263,21 @@ class GameOver extends Phaser.Scene {
         super('GameOver');
     }
         preload(){
-              this.load.image('gameOverScreen', 'assets/gameOverScreen.png');
+              this.load.image('gameOverScreen', 'assets/gameOverScreen.jpg');
         }
     create() {
         
-        var gameOverScreen = this.add.image(600, 400, 'gameOverScreen').setScale(3);
+        var gameOverScreen = this.add.image(640, 360, 'gameOverScreen').setScale(2.1);
 		this.add.text(0.5, 0.5, 'GAME OVER')
       this.time.delayedCall(2000, this.switchGameOverToMenu, null, this);
     }
     
     switchGameOverToMenu(){
         
+        keyD.reset();
+        keyQ.reset();
+        keyZ.reset(); 
+        playerInvincible=false;
          machineGunFireballActive=false,
  cooldownMachineGunFireball = 360,
  machineGunFireballUses = 0,
@@ -965,56 +1292,42 @@ class GameOver extends Phaser.Scene {
     froid.value = 200;
 	froidNombre.innerHTML = froid.value;
         level="level1"
-        viesRestantes=5
+        viesRestantes=10
         coins=0
         totalPieces.innerHTML=coins
-        froid.value = 200;
+        froid.value = 0;
 	  froidNombre.innerHTML = froid.value
-      viesRestantes-=1;
           this.scene.start('Menu');
         
     }
 }
     
 
-   /* 
-class NextLevel extends Phaser.Scene {
+    
+class Victoire extends Phaser.Scene {
 
     constructor () {
-        super('NextLevel');
+        super('Victoire');
     }
-
+        preload(){
+              this.load.image('VictoireScreen', 'assets/victoireScreen.jpg');
+        }
     create() {
-    t
-      this.time.delayedCall(1500, this.switchDeathToLevel, null, this);
+        
+        var gameOverScreen = this.add.image(600, 400, 'VictoireScreen').setScale(2.5);
+		this.add.text(0.5, 0.5, 'Victoire')
+      this.time.delayedCall(3000, this.switchToWin, null, this);
     }
     
-    switchDeathToLevel(){
- machineGunFireballActive=false,
- cooldownMachineGunFireball = 360,
- machineGunFireballUses = 0,
- cooldownFireball = 120,
- onPlatform ="",
- runSpeed = 1,
- totalCoins=0,
- jumpingPlayer = true,
- fireballPowerUpActive = false,
- fireballPlayer = true ,
- delaiFireballPlayer = 120
-    froid.value = 200;
-	froidNombre.innerHTML = froid.value;
-        level=""
-
-        coins=0
-        totalPieces.innerHTML=coins
-        froid.value = 200;
-	  froidNombre.innerHTML = froid.value
-      viesRestantes-=1;
-          this.scene.start('Jeu');
+    switchToWin(){
+                keyD.reset();
+        keyQ.reset();
+        keyZ.reset(); 
+          this.scene.start('Menu');
         
     }
 }
-   */  
+  
     
     
     
@@ -1023,6 +1336,8 @@ class NextLevel extends Phaser.Scene {
     type: Phaser.AUTO,
     width: 1280,
     height: 720,
+    backgroundColor: '#666666',
+    pixelArt: true,
     physics: {
         default: 'arcade',
         arcade: {
@@ -1034,7 +1349,7 @@ class NextLevel extends Phaser.Scene {
     input: {
         gamepad: true
     },
-    scene: [Menu, Jeu, Death, GameOver]
+    scene: [Menu, Jeu, Death, GameOver, Victoire]
 
 };
 
@@ -1067,7 +1382,7 @@ var jumpingPlayer = true
 
 var fireballPowerUpActive = true
 var fireballPlayer = true
-    
+var cooldownSnowball=90
 var delaiFireballPlayer = 120;
 var standing;
 var keyM
@@ -1075,15 +1390,15 @@ var keyZ;
 var keyS;
 var keyD;
 var keyQ;
-
+var coins;
+var playerInvincible=false;
+var playerCanResetVelocity=true;
+var hardcoreMode="off";    
+    
 var game = new Phaser.Game(config);
 
-var coins;
-
-var playerInvincible=false;
     
         </script>
-</script>
 
 </body>
 </html>
