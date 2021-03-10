@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-down" width="240" height="36" tilewidth="16" tileheight="16" infinite="0" nextlayerid="33" nextobjectid="758">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="240" height="36" tilewidth="16" tileheight="16" infinite="0" nextlayerid="33" nextobjectid="767">
  <editorsettings>
   <export target="level1.json" format="json"/>
  </editorsettings>
@@ -354,10 +354,21 @@
   <object id="734" gid="5809" x="768" y="384" width="16" height="16"/>
   <object id="735" gid="5809" x="784" y="384" width="16" height="16"/>
  </objectgroup>
- <objectgroup id="6" name="powerUpFireball"/>
- <objectgroup id="9" name="powerUpHealth"/>
- <objectgroup id="3" name="snowman"/>
- <objectgroup id="4" name="coin"/>
+ <objectgroup id="6" name="powerUpFireball">
+  <object id="759" gid="931" x="224" y="272" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup id="9" name="powerUpHealth">
+  <object id="761" gid="780" x="240" y="352" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup id="3" name="snowman">
+  <object id="762" gid="815" x="160" y="224" width="16" height="16"/>
+  <object id="763" gid="815" x="160" y="272" width="16" height="16"/>
+  <object id="764" gid="815" x="160" y="320" width="16" height="16"/>
+  <object id="766" gid="815" x="160" y="176" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup id="4" name="coin">
+  <object id="758" gid="223" x="176" y="304" width="16" height="16"/>
+ </objectgroup>
  <objectgroup id="16" name="platformFake">
   <object id="289" gid="5113" x="64" y="304" width="16" height="16"/>
   <object id="290" gid="5113" x="80" y="304" width="16" height="16"/>

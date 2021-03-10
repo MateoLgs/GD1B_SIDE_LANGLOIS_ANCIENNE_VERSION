@@ -1,4 +1,3 @@
-
 <!doctype html> 
 <html lang="en"> 
 <head> 
@@ -437,7 +436,10 @@ class Jeu extends Phaser.Scene{
 }
  
   jump(){
+      
+      
       if(gravity==1000){
+         
     player.setVelocityY(-500);
       standing=false;
        player.play('jump', true);
@@ -971,7 +973,7 @@ this.anims.create({
     this.snowmen.create(snowman.x+snowman.width/2, snowman.y-snowman.height/2, 'snowman').setScale(0.125)
         .setOrigin(0.5,0.5)
         .setDepth(-1)
-        .setBounce(1, 1)
+      //  .setBounce(1, 1)
         .setGravityY(1000)
 }
       
@@ -984,7 +986,7 @@ this.anims.create({
 }  
         this.physics.add.collider(this.snowmen, platform);
     this.physics.add.collider(this.snowmen, this.snowmen);
-    
+    this.physics.world.OVERLAP_BIAS = 10000
 
     ///////////////////////////////////////
     ////////////Pièces////////////////////
@@ -996,7 +998,7 @@ this.anims.create({
         });
 
     for (const coin of coinObjects) {
-    this.coins.create(coin.x+8, coin.y-9, 'coin')
+    this.coins.create(coin.x+8, coin.y-9, 'coin').setScale(0.0625)
         .setOrigin(0)
         .setDepth(-1);
 }
@@ -1011,7 +1013,7 @@ this.anims.create({
 
     
     ///////////////////////////////////////
-    ////////////PowerUpSnow////////////
+    ////////////PowerUpFireball////////////
     
     const powerUpFireballObjects = this.map.getObjectLayer('powerUpFireball').objects;
      this.powerUpFireball = this.physics.add.group({
@@ -1020,7 +1022,7 @@ this.anims.create({
         });
 
     for (const powerUpFireball of powerUpFireballObjects) {
-    this.powerUpFireball.create(powerUpFireball.x+8, powerUpFireball.y-5,'powerupFireball').setScale(0.3)
+    this.powerUpFireball.create(powerUpFireball.x+10, powerUpFireball.y-5,'powerupFireball').setScale(0.075)
         .setOrigin(0.5,0.5)
         .setDepth(-1);
 
@@ -1043,7 +1045,7 @@ this.anims.create({
         });
 
     for (const powerUpHealth of powerUpHealthObjects) {
-    this.powerUpHealth.create(powerUpHealth.x+8, powerUpHealth.y-5,'powerUpHealth').setScale(0.3)
+    this.powerUpHealth.create(powerUpHealth.x+8, powerUpHealth.y-10,'powerUpHealth')
         .setOrigin(0.5,0.5)
         .setDepth(-1);
 
@@ -1410,7 +1412,15 @@ for (const platformMoving of this.platformsMoving.children.entries) {
         this.jump();
     }
     
+    if(keyZ.isDown && player.body.blocked.down==false && player.body.blocked.right==true){
+        this.jump();
+        this.bouncePlatformMontagne();
+    }
 
+    if(keyZ.isDown && player.body.blocked.down==false && player.body.blocked.left==true){
+        this.jump();
+        this.bouncePlatformMontagne();
+    }
 
     
     if (keyZ.isUp)
