@@ -374,10 +374,13 @@ class Jeu extends Phaser.Scene{
 }
 
   playerInWater(){
-    gravity=100;
-   player.setGravityY(gravity)
    runSpeed=0.25
-
+      playerInWater=true
+  }
+    
+  playerInWaterTop(){
+      runSpeed=1
+      gravity=1000
   }
     
   setSpeedPlatform (player, platform) {
@@ -451,6 +454,19 @@ class Jeu extends Phaser.Scene{
       }
       }
 }
+    
+  playerPlatformMoving(player, platformMoving){
+      if(player.body.blocked.down){
+      console.log("ok")
+      if(platformMoving.direction=='LEFT'){
+         this.goLeft()
+          //  player.setVelocityX(-100);
+      }
+      if(platformMoving.direction=='RIGHT'){
+          player.setVelocityX(100);
+      }
+      }
+  }
     
   playerGoInvincible(){
             playerInvincible=true;
@@ -552,14 +568,16 @@ class Jeu extends Phaser.Scene{
 
   preload (){
 
-    var powerUpSnow = this.load.image('destroyFireball', 'assets/iceCube.png');
-    var powerUpSnow = this.load.image('powerUpSnow', 'assets/iceCube.png');
+  
+    var powerUpSnow = this.load.image('powerupFireball', 'assets/powerupFireball.png');
     var powerUpHealth = this.load.image('powerUpHealth', 'assets/powerUpHealth.png');
     var platformFake = this.load.image('platformFake', 'assets/platformFakeTile.png');
     var platformFalling = this.load.image('platformFalling', 'assets/platformFakeTile.png');
     var platformInvisible = this.load.image('platformInvisible', 'assets/platformFakeTile.png');
+    var platformMoving = this.load.image('platformMoving', 'assets/platformFakeTile.png');
     var picsInvisible = this.load.image('picsInvisible', 'assets/picsInvisible.png');
     this.load.image('fireball', 'assets/fireball.png');
+    this.load.image('coin', 'assets/cles.png');
     this.load.image('snowball', 'assets/snowball.png');
     this.load.image('yeti', 'assets/yeti.png');
     this.load.image('bomb', 'assets/bomb.png');
@@ -567,7 +585,7 @@ class Jeu extends Phaser.Scene{
     this.load.image('flag', 'assets/flag.png');
     this.load.image('snowman', 'assets/snowman.png');
     this.load.image('ground', 'assets/platform.png');
-    this.load.image('health', 'assets/star.png', { width: 10,  height: 20,});
+   // this.load.image('health', 'assets/star.png', { width: 10,  height: 20,});
     this.load.image('snowstorm', 'assets/snowstorm.png');
     this.load.image('water', 'assets/water.png');
     this.load.spritesheet('dude1', 'assets/dude1.png', { frameWidth: 32, frameHeight: 48 });
@@ -606,7 +624,7 @@ class Jeu extends Phaser.Scene{
       if(level=="level4"){
          this.map = this.make.tilemap({ key: 'level4' });
       }
-    
+
     
     this.tileset = this.map.addTilesetImage('tileset_gutter', 'tiles');
    // var background = this.map.createStaticLayer('background', this.tileset, 0, 0).setScale(1);
@@ -618,8 +636,8 @@ class Jeu extends Phaser.Scene{
     var platformIce = this.map.createDynamicLayer('platformIce', this.tileset, 0, 0);
     var pics = this.map.createDynamicLayer('pics', this.tileset, 0, 0);
     //const texteTuto = this.map.getObjectLayer('texteTuto').objects;
-
-  
+ 
+      
    platform.setCollisionByExclusion(-1, true);
    pics.setCollisionByExclusion(-1, true);
    platformEscalierDroit.setCollisionByExclusion(-1, true);
@@ -671,12 +689,12 @@ class Jeu extends Phaser.Scene{
         frameRate: 10
     });
  
-      player.setGravityY(gravity)
+      //player.setGravityY(gravity)
       this.physics.add.collider(player, platformEscalierDroit, this.playerEscalierDroit, null, this);
       this.physics.add.collider(player, platformEscalierGauche, this.playerEscalierGauche, null, this);
       this.physics.add.collider(player, pics, this.death, null, this);
      
- 
+
      //////////////////////////////////////////////
       ///////////////////////////////////////////////
       
@@ -739,16 +757,19 @@ this.anims.create({
       
       
 
-     this.goombas = this.physics.add.group(); 
+     this.goombas = this.physics.add.group({
+         allowGravity: true
+     }); 
    
      const goombaObjects = this.map.getObjectLayer('goomba').objects;
 
 
     for (const goomba of goombaObjects) {
-    this.goombas.create(goomba.x, goomba.y, 'atlas')
+    this.goombas.create(goomba.x, goomba.y-11, 'atlas')
         .setOrigin(0.5,0.5)
         .setDepth(-1)
-        .setScale(1.5);
+        .setScale(1.5)
+        .setGravityY(1000)
 }
       
     
@@ -808,7 +829,34 @@ this.anims.create({
     
 }  
       
-         ///////////////////////////////////////
+      
+      
+      
+      
+      
+    ///////////////////////////////////////
+    ////////////platformMoving////////////////////
+
+    const platformMovingObjects = this.map.getObjectLayer('platformMoving').objects;
+    this.platformsMoving = this.physics.add.group({
+            immovable: true,
+            allowGravity: false
+        });
+
+    for (const platformMoving of platformMovingObjects) {
+    this.platformsMoving.create(platformMoving.x+7, platformMoving.y-8, 'platformMoving').setScale(0.4)
+        .setOrigin(0.5,0.5)
+        .setDepth(-1)
+     
+    }
+
+    for (const platformMoving of this.platformsMoving.children.entries) {
+        this.physics.add.collider(player, platformMoving, this.playerPlatformMoving, null, this)
+        this.physics.add.collider(platformMoving, platform);
+}    
+      
+
+    ///////////////////////////////////////
     ////////////platformFalling////////////////////
 
     const platformFallingObjects = this.map.getObjectLayer('platformFalling').objects;
@@ -845,8 +893,26 @@ this.anims.create({
     }
 
     for (const water of this.waters.children.entries) {
-    water.collider = this.physics.add.overlap(water, player, this.playerInWater, null, this);
-    
+    water.collider = this.physics.add.overlap(water, player, this.playerInWater, null, this); 
+}  
+          ///////////////////////////////////////
+    ////////////waterTop//////////////////////
+
+    const waterTopObjects = this.map.getObjectLayer('waterTop').objects;
+    this.watersTop = this.physics.add.group({
+            immovable: true,
+            allowGravity: false
+        });
+
+    for (const waterTop of waterTopObjects) {
+    this.watersTop.create(waterTop.x+7, waterTop.y-8, 'water').setScale(0.015)
+        .setOrigin(0.5,0.5)
+        .setDepth(-1)
+     
+    }
+
+    for (const waterTop of this.watersTop.children.entries) {
+     waterTop.collider = this.physics.add.overlap(waterTop, player, this.playerInTopWater, null, this); 
 }  
     ///////////////////////////////////////
     ////////////platformFake////////////////////
@@ -878,7 +944,8 @@ this.anims.create({
     for (const yeti of yetiObjects) {
     this.yetis.create(yeti.x, yeti.y-20, 'yeti').setScale(0.25)
         .setOrigin(0.5,0.5)
-        .setDepth(-1);
+        .setDepth(-1)
+        .setGravityY(1000)
 }
       
     
@@ -905,6 +972,7 @@ this.anims.create({
         .setOrigin(0.5,0.5)
         .setDepth(-1)
         .setBounce(1, 1)
+        .setGravityY(1000)
 }
       
     
@@ -928,22 +996,13 @@ this.anims.create({
         });
 
     for (const coin of coinObjects) {
-    this.coins.create(coin.x+8, coin.y-9, 'atlas')
+    this.coins.create(coin.x+8, coin.y-9, 'coin')
         .setOrigin(0)
         .setDepth(-1);
 }
       
     
-    this.anims.create({
-    key: 'rotate',
-    frames: this.anims.generateFrameNames('atlas', {
-        prefix: 'mario-atlas_',
-        start: 6,
-        end: 9,
-    }),
-    frameRate: 10,
-    repeat: -1
-});
+
     
     for (const coin of this.coins.children.entries) {
     coin.collider = this.physics.add.overlap(coin, player, this.collectCoin, null, this);
@@ -961,7 +1020,7 @@ this.anims.create({
         });
 
     for (const powerUpFireball of powerUpFireballObjects) {
-    this.powerUpFireball.create(powerUpFireball.x+8, powerUpFireball.y-5,'powerUpSnow').setScale(0.3)
+    this.powerUpFireball.create(powerUpFireball.x+8, powerUpFireball.y-5,'powerupFireball').setScale(0.3)
         .setOrigin(0.5,0.5)
         .setDepth(-1);
 
@@ -1140,16 +1199,23 @@ this.anims.create({
     this.physics.add.collider(player, platformSnow, this.setSpeedPlatformSnow, null, this);
     this.physics.add.collider(player, platformIce, this.setSpeedPlatformIce, null, this);
     
-    
-  
+
 }
 
   update (){
       
 
+      if(playerInWater==true){
+          gravity=100
+      player.setGravityY(gravity)
+      }
+      if(playerInWater==false){
+          gravity=1000
+      player.setGravityY(gravity)
+      }
       
       
-      
+      playerInWater=false;
       
       
       
@@ -1198,12 +1264,28 @@ if(player.x>platformFalling.x && player.x<platformFalling.x+32 && player.y>platf
             yeti.setVelocityX(-150);
         }
 
-       // !goomba.isDed && goomba.play('goombaRun', true);
 
     }
 
 
+for (const platformMoving of this.platformsMoving.children.entries) {
+        if (platformMoving.body.blocked.right) {
+            platformMoving.direction = 'LEFT';
+        }
 
+        if (platformMoving.body.blocked.left) {
+            platformMoving.direction = 'RIGHT';
+        }
+
+        if (platformMoving.direction === 'RIGHT') {
+            platformMoving.setVelocityX(100);
+        } else {
+            platformMoving.setVelocityX(-100);
+        }
+
+      
+
+    }
 
     //console.log(this.snowman.x)
       cooldownSnowball--
@@ -1215,10 +1297,7 @@ if(player.x>platformFalling.x && player.x<platformFalling.x+32 && player.y>platf
        //this.time.delayedCall(1000, this.lancerSnowballSnowman, null, this);
       
     
-    //Autorise les pieces à tourner
-    for (const coin of this.coins.children.entries) {
-        coin.play('rotate', true);
-    }
+
 
 
     // définie le contact du joueur avec un sol
@@ -1355,7 +1434,7 @@ if(player.x>platformFalling.x && player.x<platformFalling.x+32 && player.y>platf
     
     
     
-    if (player.y>600){
+    if (player.y>1000){
         this.death();
     }
     
@@ -1506,7 +1585,7 @@ class Victoire extends Phaser.Scene {
     physics: {
         default: 'arcade',
         arcade: {
-           // gravity: { y: 1000 },
+            //gravity: { y: 1000 },
             debug: false,
             fps: 60
         },
@@ -1558,7 +1637,8 @@ var keyQ;
 var coins;
 var playerInvincible=false;
 var playerCanResetVelocity=true;
-var hardcoreMode="off";    
+var hardcoreMode="off";  
+var playerInWater = true;
     
 var game = new Phaser.Game(config);
 

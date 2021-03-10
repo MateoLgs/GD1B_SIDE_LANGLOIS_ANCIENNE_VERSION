@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-down" width="145" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="31" nextobjectid="275">
+<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-down" width="145" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="34" nextobjectid="278">
  <editorsettings>
   <export target="tutoriel.json" format="json"/>
  </editorsettings>
@@ -117,4 +117,10 @@
  </objectgroup>
  <objectgroup id="20" name="yeti"/>
  <objectgroup id="30" name="water"/>
+ <objectgroup id="32" name="platformMoving">
+  <object id="275" gid="15372" x="224" y="224" width="16" height="16"/>
+  <object id="276" gid="15372" x="240" y="224" width="16" height="16"/>
+  <object id="277" gid="15372" x="256" y="224" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup id="33" name="waterTop"/>
 </map>
