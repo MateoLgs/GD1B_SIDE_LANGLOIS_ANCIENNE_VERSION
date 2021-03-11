@@ -1,5 +1,5 @@
 <!doctype html> 
-<html lang="en"> 
+<html lang="fr"> 
 <head> 
     <meta charset="UTF-8" />
     <title>Making your first Phaser 3 Game - Part 4</title>
@@ -973,7 +973,7 @@ this.anims.create({
     this.snowmen.create(snowman.x+snowman.width/2, snowman.y-snowman.height/2, 'snowman').setScale(0.125)
         .setOrigin(0.5,0.5)
         .setDepth(-1)
-      //  .setBounce(1, 1)
+        .setBounce(1, 1)
         .setGravityY(1000)
 }
       
@@ -986,7 +986,7 @@ this.anims.create({
 }  
         this.physics.add.collider(this.snowmen, platform);
     this.physics.add.collider(this.snowmen, this.snowmen);
-    this.physics.world.OVERLAP_BIAS = 10000
+  //  this.physics.world.OVERLAP_BIAS = 10000
 
     ///////////////////////////////////////
     ////////////Pièces////////////////////

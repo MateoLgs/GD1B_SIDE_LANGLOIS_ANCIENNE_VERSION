@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-down" width="145" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="34" nextobjectid="278">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="145" height="25" tilewidth="16" tileheight="16" infinite="0" nextlayerid="34" nextobjectid="289">
  <editorsettings>
   <export target="tutoriel.json" format="json"/>
  </editorsettings>
@@ -88,6 +88,17 @@
   <object id="260" gid="433" x="1184" y="336" width="16" height="16"/>
   <object id="261" gid="433" x="1168" y="336" width="16" height="16"/>
   <object id="262" gid="433" x="1184" y="352" width="16" height="16"/>
+  <object id="278" gid="433" x="1168" y="320" width="16" height="16"/>
+  <object id="279" gid="433" x="1184" y="320" width="16" height="16"/>
+  <object id="280" gid="433" x="1200" y="320" width="16" height="16"/>
+  <object id="281" gid="433" x="1216" y="320" width="16" height="16"/>
+  <object id="282" gid="433" x="1216" y="336" width="16" height="16"/>
+  <object id="283" gid="433" x="1216" y="352" width="16" height="16"/>
+  <object id="284" gid="433" x="1216" y="368" width="16" height="16"/>
+  <object id="285" gid="433" x="1152" y="368" width="16" height="16"/>
+  <object id="286" gid="433" x="1152" y="352" width="16" height="16"/>
+  <object id="287" gid="433" x="1152" y="336" width="16" height="16"/>
+  <object id="288" gid="433" x="1152" y="320" width="16" height="16"/>
  </objectgroup>
  <objectgroup id="19" name="picsInvisible">
   <object id="241" gid="16133" x="1056" y="384" width="16" height="16"/>
