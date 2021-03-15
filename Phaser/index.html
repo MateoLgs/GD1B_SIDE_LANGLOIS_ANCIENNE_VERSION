@@ -1,5 +1,5 @@
 <!doctype html> 
-<html lang="fr"> 
+<html lang="en"> 
 <head> 
     <meta charset="UTF-8" />
     <title>Making your first Phaser 3 Game - Part 4</title>
@@ -121,79 +121,59 @@ class Jeu extends Phaser.Scene{
       snowman.destroy();
       fireball.destroy();
   }    
-    
-  lancerFireballRight(player){
-        var bomb = bombs.create(player.x, player.y, 'fireball');
-        bomb.setBounce(0.9);
-        bomb.body.setAllowGravity(false);
-        bomb.setVelocity(700, 0);
-
-}
    
-  lancerFireballLeft(player){
-      var bomb = bombs.create(player.x, player.y, 'fireball');
-        bomb.body.setAllowGravity(false);
-        bomb.setVelocity(-700, 0);
-}
-    
-  lancerFireballUp(player){
-      var bomb = bombs.create(player.x, player.y, 'fireball');
-        bomb.setBounce(0.9);
-        bomb.body.setAllowGravity(false);
-        bomb.setVelocity(0, -700);
-}
-    
-  lancerFireballDown(player){
-      var bomb = bombs.create(player.x, player.y, 'fireball');
-        bomb.setBounce(0.9);
-        bomb.body.setAllowGravity(false);
-        bomb.setVelocity(0, 700);
-}   
-   
-  /*lancerfireball(player){
+  lancerfireball(player){
 
 
-         var bomb = bombs.create(player.x, player.y, 'fireball');
-        bomb.setBounce(0.9);
-        bomb.body.setAllowGravity(false);
+         var bomb = bombs.create(player.x, player.y-15, 'fireball');
+        bomb.setBounce(1);
+        bomb.setGravityY(2000)
     
         var directionFireballPlayer = Math.round(Phaser.Math.Between(0,1))
         
         if(keyQ.isDown){
-            directionFireballPlayer=-700;
+            directionFireballPlayer=-400;
         }
         else if(keyD.isDown){
-            directionFireballPlayer=700;
+            directionFireballPlayer=400;
         }
         else if(keyD.isUp && keyQ.isUp && keyZ.isUp && directionFireballPlayer==1){
-            directionFireballPlayer=700;
+            directionFireballPlayer=400;
         }
         else if(keyD.isUp && keyQ.isUp && keyZ.isUp && directionFireballPlayer==0){
-            directionFireballPlayer=-700;
+            directionFireballPlayer=-400;
         }
     
     
         
         if(cursors.left.isDown){
-            directionFireballPlayer=-700;
+            directionFireballPlayer=-400;
         }
         else if(cursors.right.isDown){
-            directionFireballPlayer=700;
+            directionFireballPlayer=400;
         }
         else if(cursors.left.isUp && cursors.right.isUp && cursors.up.isUp  && directionFireballPlayer==1){
-            directionFireballPlayer=700;
+            directionFireballPlayer=400;
         }
         else if(cursors.left.isUp && cursors.right.isUp && cursors.up.isUp && directionFireballPlayer==0){
-            directionFireballPlayer=-700;
+            directionFireballPlayer=-400;
         }
         
-        bomb.setVelocity(directionFireballPlayer, 0);
-       
+      if(playerDirection=="right"){
+        bomb.setVelocity(400, 200);
+      }
+      else if(playerDirection=="left"){
+        bomb.setVelocity(-400, 200);
+      }
     
-      }*/
+      }
  
   destroyFireball(bomb){
-    bomb.destroy();
+        if(bomb.body.blocked.down==false && bomb.body.blocked.up==false){
+          bomb.destroy();
+        }
+
+
 }  
 
   destroySnowball(snowball){
@@ -201,7 +181,7 @@ class Jeu extends Phaser.Scene{
 }
     
   destroyPlatformFake(platformFake){
-      platformFake.disableBody(true, true);
+      platformFake.destroy();
      
       //platformFake.setAlpha(0.2)
       console.log("destroy")
@@ -334,6 +314,7 @@ class Jeu extends Phaser.Scene{
         keyD.reset();
         keyQ.reset();
         keyZ.reset(); 
+        
            player.setVelocityX(-150);
       }
        if(player.body.blocked.left){
@@ -420,6 +401,8 @@ class Jeu extends Phaser.Scene{
       else if(standing==false){
       player.play('jump', true).setFlipX(false);
       }
+            playerDirection="right"
+
           player.setVelocityX(250*runSpeed);
     
    
@@ -432,6 +415,7 @@ class Jeu extends Phaser.Scene{
       else if(standing==false){
       player.play('jump', true).setFlipX(true);
       }
+      playerDirection="left"
           player.setVelocityX(-250*runSpeed);
 }
  
@@ -651,10 +635,10 @@ class Jeu extends Phaser.Scene{
 
       
       
+      this.input.gamepad.on('down', function (pad, button, index) {
+        return;
+    }),
       
-      
-      
-    
   
       /////////////////////////////////////////
       /////////////PLAYER//////////////////////
@@ -1205,8 +1189,22 @@ this.anims.create({
 }
 
   update (){
-      
+           var pads = this.input.gamepad.gamepads;
 
+    for (var i = 0; i < pads.length; i++)
+    {
+        var gamepad = pads[i];
+
+ if (!gamepad)
+    {
+        return;
+    }
+
+
+      
+      
+      
+      
       if(playerInWater==true){
           gravity=100
       player.setGravityY(gravity)
@@ -1332,39 +1330,16 @@ for (const platformMoving of this.platformsMoving.children.entries) {
 
 
     
-    if (cursors.right.isDown )
+    if (cursors.down.isDown || gamepad.B )
     {
         if(fireballPlayer == true && fireballPowerUpActive==true){
         fireballPlayer = false;
-        this.lancerFireballRight(player);
+        this.lancerfireball(player);
         } 
     }
     
     
-    if (cursors.left.isDown )
-    {
-        if(fireballPlayer == true && fireballPowerUpActive==true){
-        fireballPlayer = false;
-        this.lancerFireballLeft(player);
-        } 
-    } 
-    
-    if (cursors.up.isDown )
-    {
-        if(fireballPlayer == true && fireballPowerUpActive==true){
-        fireballPlayer = false;
-        this.lancerFireballUp(player);
-        } 
-    } 
-    
-        if (cursors.down.isDown )
-    {
-        if(fireballPlayer == true && fireballPowerUpActive==true){
-        fireballPlayer = false;
-        this.lancerFireballDown(player);
-        } 
-    } 
-    
+
     
     
     
@@ -1380,14 +1355,15 @@ for (const platformMoving of this.platformsMoving.children.entries) {
     
     
     
+
     
     
     
-    if (keyQ.isDown)
+    if (keyQ.isDown || gamepad.left)
     {
         this.goLeft();
     }
-    if (keyD.isDown)
+    if (keyD.isDown || gamepad.right)
     {
         this.goRight();
     }
@@ -1406,12 +1382,16 @@ for (const platformMoving of this.platformsMoving.children.entries) {
     }
 
     
-    if (keyZ.isDown && jumpingPlayer==false)
+    if (keyZ.isDown || gamepad.A )
+    {
+        if(jumpingPlayer==false)
+    
     {
         standing = false;
         this.jump();
     }
-    
+    }
+ /*   
     if(keyZ.isDown && player.body.blocked.down==false && player.body.blocked.right==true){
         this.jump();
         this.bouncePlatformMontagne();
@@ -1420,7 +1400,7 @@ for (const platformMoving of this.platformsMoving.children.entries) {
     if(keyZ.isDown && player.body.blocked.down==false && player.body.blocked.left==true){
         this.jump();
         this.bouncePlatformMontagne();
-    }
+    }*/
 
     
     if (keyZ.isUp)
@@ -1431,7 +1411,7 @@ for (const platformMoving of this.platformsMoving.children.entries) {
 
     
     
-    if (keyD.isUp && keyQ.isUp && playerCanResetVelocity==true )
+    if (keyD.isUp && keyQ.isUp && gamepad.left==false && gamepad.right==false &&  playerCanResetVelocity==true )
     {
             
         player.setVelocityX(0);
@@ -1457,7 +1437,7 @@ for (const platformMoving of this.platformsMoving.children.entries) {
         this.death();
     }
     
-
+    }
 }
 
 }
@@ -1600,9 +1580,9 @@ class Victoire extends Phaser.Scene {
             fps: 60
         },
     },
-    input: {
-        gamepad: true
-    },
+        input: {
+            gamepad: true
+        },
     scene: [Menu, Jeu, Death, GameOver, Victoire]
 
 };
@@ -1649,9 +1629,9 @@ var playerInvincible=false;
 var playerCanResetVelocity=true;
 var hardcoreMode="off";  
 var playerInWater = true;
+var playerDirection ="right"
     
 var game = new Phaser.Game(config);
-
     
         </script>
 
