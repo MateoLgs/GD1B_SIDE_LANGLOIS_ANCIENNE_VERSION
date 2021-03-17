@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-down" width="240" height="36" tilewidth="16" tileheight="16" infinite="0" nextlayerid="33" nextobjectid="769">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="240" height="36" tilewidth="16" tileheight="16" infinite="0" nextlayerid="33" nextobjectid="771">
  <editorsettings>
   <export target="level1.json" format="json"/>
  </editorsettings>
@@ -338,8 +338,11 @@
  <objectgroup id="3" name="snowman">
   <object id="767" gid="5338" x="576" y="256" width="16" height="16"/>
   <object id="768" gid="5338" x="576" y="144" width="16" height="16"/>
+  <object id="770" gid="5114" x="64" y="320" width="16" height="16"/>
  </objectgroup>
- <objectgroup id="4" name="coin"/>
+ <objectgroup id="4" name="coin">
+  <object id="769" gid="433" x="96" y="336" width="16" height="16"/>
+ </objectgroup>
  <objectgroup id="16" name="platformFake">
   <object id="289" gid="5113" x="64" y="304" width="16" height="16"/>
   <object id="290" gid="5113" x="80" y="304" width="16" height="16"/>

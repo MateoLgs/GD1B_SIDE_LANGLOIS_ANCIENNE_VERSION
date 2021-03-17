@@ -11,13 +11,7 @@
     </style>
 </head>
  <body>
-<div>
-<div>Vies : <span id="vies">10</span></div>
- <div>Pièces : <span id="totalPieces">0</span></div>
-<span>Froid : </span>
-<label id="froidNombre">0 </label><span> %</span>
-<progress  value="0" max="100" id="froid"></progress>
-    </div>
+
 <script type="text/javascript">
      
 
@@ -87,6 +81,27 @@ class Jeu extends Phaser.Scene{
         super('Jeu');
       }
 
+  updateFroid(){
+        if(froid==3){
+            froid1.destroy();
+            froid2.destroy();
+            froid3.destroy();
+
+       }
+       if(froid==2){
+            froid1.destroy();
+            froid2.destroy();
+            froid3.destroy();
+            froid1 = this.physics.add.sprite(500, 180, 'froid').setScrollFactor(0).setScale(0.02).setDepth(1);
+       }
+        if(froid==1){
+            froid1.destroy();
+            froid2.destroy();
+            froid3.destroy();
+            froid1 = this.physics.add.sprite(500, 180, 'froid').setScrollFactor(0).setScale(0.02).setDepth(1);
+            froid2 = this.physics.add.sprite(540, 180, 'froid').setScrollFactor(0).setScale(0.02).setDepth(1);
+       }
+   }
     
   lancerSnowballYeti(yeti){
 
@@ -210,8 +225,8 @@ class Jeu extends Phaser.Scene{
     powerUpHealth.destroy();
 
     //  Add and update the score
-    froid.value -= 20;
-	froidNombre.innerHTML = froid.value;
+    froid -= 1;
+	this.updateFroid();
  
 }
     
@@ -220,8 +235,9 @@ class Jeu extends Phaser.Scene{
      Health.innerHTML=healthAmount*/
     coin.destroy();
     totalCoins+=1;
-    totalPieces.innerHTML=totalCoins
-    console.log(totalCoins);
+    textPieces.destroy();
+    textPieces = this.add.text(280, 200,  totalCoins,{ fill:'#fff', size:200}).setScrollFactor(0).setDepth(1);  
+      console.log(totalCoins);
       
 }
     
@@ -238,7 +254,7 @@ class Jeu extends Phaser.Scene{
     if(totalCoins>14){
     console.log(level)   
     totalCoins=0;
-    totalPieces.innerHTML=coins;
+
     if(level=="level4"){
         this.scene.start("Victoire");
     } 
@@ -270,8 +286,8 @@ class Jeu extends Phaser.Scene{
           this.death();
       }
       if(playerInvincible==false && hardcoreMode=="off"){
-     froid.value += 50;
-	froidNombre.innerHTML = froid.value;
+        froid+=1;
+        this.updateFroid();
       }
              this.bounce();
 
@@ -341,11 +357,14 @@ class Jeu extends Phaser.Scene{
           this.death();
       }
     if(playerInvincible==false && hardcoreMode=="off"){
-     froid.value += 25;
-	froidNombre.innerHTML = froid.value;
+     froid+=1;
+        this.updateFroid();
+
+
+
         this.playerGoInvincible();
     }
-                
+      
 
   }
     
@@ -522,7 +541,7 @@ class Jeu extends Phaser.Scene{
   mort(){
          
     viesRestantes-=1;
-    vies.innerHTML=viesRestantes;
+  
     if(viesRestantes>0){
    player.setVelocityX(0);
      this.scene.start('Death');
@@ -571,6 +590,8 @@ class Jeu extends Phaser.Scene{
     this.load.image('flag', 'assets/flag.png');
     this.load.image('snowman', 'assets/snowman.png');
     this.load.image('ground', 'assets/platform.png');
+    this.load.image('life', 'assets/life.png')
+    this.load.image('froid', 'assets/froid.png')
    // this.load.image('health', 'assets/star.png', { width: 10,  height: 20,});
     this.load.image('snowstorm', 'assets/snowstorm.png');
     this.load.image('water', 'assets/water.png');
@@ -635,15 +656,26 @@ class Jeu extends Phaser.Scene{
 
       
       
-      this.input.gamepad.on('down', function (pad, button, index) {
+    /*  this.input.gamepad.on('down', function (pad, button, index) {
         return;
-    }),
+    }),*/
       
   
       /////////////////////////////////////////
       /////////////PLAYER//////////////////////
- 
-    player = this.physics.add.sprite(32, 0, 'atlas').setScale(1.5);
+    
+    this.add.text(280, 170,  viesRestantes,{ fill:'#fff', size:200}).setScrollFactor(0).setDepth(1);  
+    var life = this.physics.add.sprite(320, 180, 'life').setScrollFactor(0).setScale(0.05).setDepth(1);
+      
+    textPieces = this.add.text(280, 200,  totalCoins,{ fill:'#fff', size:200}).setScrollFactor(0).setDepth(1);  
+    var pieces = this.physics.add.sprite(320, 210, 'coin').setScrollFactor(0).setScale(0.08).setDepth(1);
+        
+    froid1 = this.physics.add.sprite(500, 180, 'froid').setScrollFactor(0).setScale(0.02).setDepth(1);
+    froid2 = this.physics.add.sprite(540, 180, 'froid').setScrollFactor(0).setScale(0.02).setDepth(1);
+    froid3 = this.physics.add.sprite(580, 180, 'froid').setScrollFactor(0).setScale(0.02).setDepth(1);
+      
+    player = this.physics.add.sprite(32, 160, 'atlas').setScale(1.5);
+    player.setGravityY(1000)
     player.setCollideWorldBounds(false);
     player.setDrag(0.5)
     this.anims.create({
@@ -1189,20 +1221,18 @@ this.anims.create({
 }
 
   update (){
-           var pads = this.input.gamepad.gamepads;
+           /*var pads = this.input.gamepad.gamepads;
 
     for (var i = 0; i < pads.length; i++)
     {
-        var gamepad = pads[i];
+        var gamepad = pads[i];*/
 
- if (!gamepad)
+ /*if (!gamepad)
     {
         return;
-    }
+    }*/
 
 
-      
-      
       
       
       if(playerInWater==true){
@@ -1330,7 +1360,7 @@ for (const platformMoving of this.platformsMoving.children.entries) {
 
 
     
-    if (cursors.down.isDown || gamepad.B )
+    if (cursors.down.isDown /*|| gamepad.B*/ )
     {
         if(fireballPlayer == true && fireballPowerUpActive==true){
         fireballPlayer = false;
@@ -1359,11 +1389,11 @@ for (const platformMoving of this.platformsMoving.children.entries) {
     
     
     
-    if (keyQ.isDown || gamepad.left)
+    if (keyQ.isDown /*|| gamepad.left*/)
     {
         this.goLeft();
     }
-    if (keyD.isDown || gamepad.right)
+    if (keyD.isDown /*|| gamepad.right*/)
     {
         this.goRight();
     }
@@ -1382,7 +1412,7 @@ for (const platformMoving of this.platformsMoving.children.entries) {
     }
 
     
-    if (keyZ.isDown || gamepad.A )
+    if (keyZ.isDown /*|| gamepad.A*/ )
     {
         if(jumpingPlayer==false)
     
@@ -1411,7 +1441,7 @@ for (const platformMoving of this.platformsMoving.children.entries) {
 
     
     
-    if (keyD.isUp && keyQ.isUp && gamepad.left==false && gamepad.right==false &&  playerCanResetVelocity==true )
+    if (keyD.isUp && keyQ.isUp /*&& gamepad.left==false && gamepad.right==false*/ &&  playerCanResetVelocity==true )
     {
             
         player.setVelocityX(0);
@@ -1428,19 +1458,19 @@ for (const platformMoving of this.platformsMoving.children.entries) {
         this.death();
     }
     
-    if (froid.value<50.1 && machineGunFireballActive==false && hardcoreMode=="on"){
+    if (froid==1 && machineGunFireballActive==false && hardcoreMode=="on"){
 
       cooldownFireball=240
     }
     
-    if (froid.value>99.9){
+    if (froid==3){
         this.death();
     }
     
     }
 }
 
-}
+
     
     
     
@@ -1478,12 +1508,12 @@ playerInvincible=false;
  fireballPowerUpActive = false,
  fireballPlayer = true ,
  delaiFireballPlayer = 120
-    froid.value = 0;
-	froidNombre.innerHTML = froid.value;
+    froid = 0;
+
  
 
         coins=0
-        totalPieces.innerHTML=coins
+   
 
           this.scene.start('Jeu');
         
@@ -1523,14 +1553,14 @@ class GameOver extends Phaser.Scene {
  fireballPowerUpActive = false,
  fireballPlayer = true ,
  delaiFireballPlayer = 120
-    froid.value = 200;
-	froidNombre.innerHTML = froid.value;
+    froid = 0;
+
         level="level1"
         viesRestantes=10
         coins=0
-        totalPieces.innerHTML=coins
-        froid.value = 0;
-	  froidNombre.innerHTML = froid.value
+
+        froid = 0;
+
           this.scene.start('Menu');
         
     }
@@ -1580,9 +1610,9 @@ class Victoire extends Phaser.Scene {
             fps: 60
         },
     },
-        input: {
+       /* input: {
             gamepad: true
-        },
+        }*/
     scene: [Menu, Jeu, Death, GameOver, Victoire]
 
 };
@@ -1614,7 +1644,7 @@ var roquettes;
 var viesRestantes=10;
 var jumpingPlayer = true
 var gravity=1000;
-var fireballPowerUpActive = true
+var fireballPowerUpActive = false
 var fireballPlayer = true
 var cooldownSnowball=90
 var delaiFireballPlayer = 120;
@@ -1628,9 +1658,13 @@ var coins;
 var playerInvincible=false;
 var playerCanResetVelocity=true;
 var hardcoreMode="off";  
-var playerInWater = true;
+var playerInWater = false;
 var playerDirection ="right"
-    
+var textPieces;
+var froid1;
+var froid2;
+var froid3;
+var froid = 0;
 var game = new Phaser.Game(config);
     
         </script>
