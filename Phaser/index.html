@@ -243,9 +243,9 @@ class Jeu extends Phaser.Scene{
     
   collectPowerUpFireball(powerUpFireball){
     powerUpFireball.destroy();
-    if(fireballPowerUpActive==true){
+    /*if(fireballPowerUpActive==true){
         machineGunFireballUses+=1;
-    }
+    }*/
     fireballPowerUpActive= true;
 }
     
@@ -316,6 +316,7 @@ class Jeu extends Phaser.Scene{
       else if(player.body.touching.left){
            player.setVelocityX(+250);
       }
+
      
         this.time.delayedCall(400, this.inputEnabled, null, this);   
   }
@@ -722,7 +723,7 @@ class Jeu extends Phaser.Scene{
       
       
       
-      
+   /*   
     var snowstorm = this.physics.add.sprite(-900, 0, 'snowstorm').setOrigin(0, 0);
       if(hardcoreMode=="off"){
         snowstorm.body.velocity.x=10;
@@ -731,7 +732,7 @@ class Jeu extends Phaser.Scene{
         snowstorm.body.velocity.x=17;
       }
   
-    snowstorm.body.allowGravity = false
+    snowstorm.body.allowGravity = false*/
 
    
       
@@ -1015,7 +1016,7 @@ this.anims.create({
 
     for (const coin of coinObjects) {
     this.coins.create(coin.x+8, coin.y-9, 'coin').setScale(0.0625)
-        .setOrigin(0)
+        .setOrigin(0.5,0.5)
         .setDepth(-1);
 }
       
@@ -1606,7 +1607,7 @@ class Victoire extends Phaser.Scene {
         default: 'arcade',
         arcade: {
             //gravity: { y: 1000 },
-            debug: false,
+            debug: true,
             fps: 60
         },
     },
@@ -1622,7 +1623,7 @@ var level="level1";
 
 var machineGunFireballActive=false;
 var cooldownMachineGunFireball = 360;
-var machineGunFireballUses = 3;
+var machineGunFireballUses = 0;
 var cooldownFireball = 120;
 var onPlatform ="";
 var bomb;
