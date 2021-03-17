@@ -404,6 +404,7 @@ class Jeu extends Phaser.Scene{
   setSpeedPlatformIce (player, platform) {
     if(player.body.blocked.down || player.body.touching.down){
        standing=true
+        //player.body.acceleration.x=50;
       }
 
       console.log("onPlatform")
