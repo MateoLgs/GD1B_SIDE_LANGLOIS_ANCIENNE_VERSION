@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-down" width="240" height="36" tilewidth="16" tileheight="16" infinite="0" nextlayerid="33" nextobjectid="788">
  <editorsettings>
-  <export target="C:/Phaser_Projet_Spe_Prog/Phaser/assets/level1.json" format="json"/>
+  <export target="level1.json" format="json"/>
  </editorsettings>
  <tileset firstgid="1" name="map-tileset" tilewidth="16" tileheight="16" spacing="1" margin="1" tilecount="5112" columns="36">
   <image source="tiles.png" width="613" height="2415"/>
@@ -10,7 +10,7 @@
   <image source="tileset_gutter.png" trans="ff00ff" width="594" height="504"/>
  </tileset>
  <tileset firstgid="6037" name="tileset" tilewidth="16" tileheight="16" tilecount="1147" columns="37">
-  <image source="C:/Phaser_Projet_Spe_Prog/Phaser/assets/tileset.png" trans="003039" width="594" height="504"/>
+  <image source="tileset.png" trans="003039" width="594" height="504"/>
  </tileset>
  <layer id="2" name="background" width="240" height="36" visible="0">
   <data encoding="base64">
